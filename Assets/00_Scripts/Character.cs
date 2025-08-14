@@ -10,4 +10,16 @@ public class Character : MonoBehaviour
         anim = transform.GetChild(0).GetComponent<Animator>();
         sprRr = transform.GetChild(0).GetComponent<SpriteRenderer>();
     }
+
+    protected void AnimChange(string temp, bool trigger)
+    {
+        if(trigger)
+        {
+            anim.SetTrigger(temp);
+        }
+        else
+        {
+            anim.SetBool(temp, true);
+        }
+    }
 }

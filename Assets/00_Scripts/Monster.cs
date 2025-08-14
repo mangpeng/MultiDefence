@@ -12,6 +12,9 @@ public class Monster : Character
     private int curTargetIdx = 0;
     private Vector2 curTarget;
 
+    public int hp = 100;
+    private bool isDead = false;
+
     protected override void Start()
     {
         base.Start();
@@ -23,6 +26,8 @@ public class Monster : Character
 
     private void Update()
     {
+        if (isDead) return;
+
         // Move
         transform.position = Vector2.MoveTowards(transform.position, curTarget, Time.deltaTime * MOVE_SPEED);
 
@@ -101,4 +106,35 @@ public class Monster : Character
         return (curTargetIdx + 1) % CharacterSpawner.monsterMoveList.Count;
     }
     #endregion
+
+    public void GetDamage(int dmg)
+    {
+        if (isDead) return;
+
+        hp -= dmg;
+        if(hp <= 0)
+        {
+            isDead = true;
+            gameObject.layer = LayerMask.NameToLayer("Default");
+            AnimChange("DEAD", true);
+            StartCoroutine(CDead());
+        }
+    }
+
+    IEnumerator CDead()
+    {
+        float alpha = 1.0f;
+        while(sprRr.color.a > 0.0f)
+        {
+            alpha -= Time.deltaTime;
+            var color = sprRr.color;
+            color.a = alpha;
+
+            sprRr.color = color;
+
+            yield return null;
+        }
+
+        Destroy(this.gameObject);
+    }
 }

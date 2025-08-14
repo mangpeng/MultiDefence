@@ -46,6 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ee789a5620b0864f8601fc174716aff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attackRange: 1
 --- !u!1 &7718687759368404814
 GameObject:
   m_ObjectHideFlags: 0
@@ -57,7 +58,7 @@ GameObject:
   - component: {fileID: 3749462197069590112}
   - component: {fileID: 3052696371237532774}
   m_Layer: 0
-  m_Name: Circle
+  m_Name: Shadow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

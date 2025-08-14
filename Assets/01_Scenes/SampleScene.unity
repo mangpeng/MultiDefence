@@ -217,7 +217,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 76.46}
+  m_AnchoredPosition: {x: 0, y: 269.75}
   m_SizeDelta: {x: 410.9, y: 241.51}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &423463542
@@ -583,7 +583,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 613562f584142fb4093c3f54bb3cc9d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MONSTER_SPAWN_INTERVAL: 3
+  MONSTER_SPAWN_INTERVAL: 10
   prefPlayer: {fileID: 4480561131397840941, guid: 4df6f44a6cc76ed40a81a2eaa1e0ceca, type: 3}
   prefMonster: {fileID: 5170184945953356536, guid: 8e980e18cc3b86d41b20ac1c59a52de9, type: 3}
 --- !u!212 &565239181
@@ -1027,6 +1027,6 @@ SceneRoots:
   m_Roots:
   - {fileID: 519420032}
   - {fileID: 619394802}
-  - {fileID: 565239182}
   - {fileID: 463206243}
   - {fileID: 918417483}
+  - {fileID: 565239182}
