@@ -583,7 +583,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 613562f584142fb4093c3f54bb3cc9d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MONSTER_SPAWN_INTERVAL: 10
+  MONSTER_SPAWN_INTERVAL: 1
   prefPlayer: {fileID: 4480561131397840941, guid: 4df6f44a6cc76ed40a81a2eaa1e0ceca, type: 3}
   prefMonster: {fileID: 5170184945953356536, guid: 8e980e18cc3b86d41b20ac1c59a52de9, type: 3}
 --- !u!212 &565239181

@@ -2,23 +2,28 @@ using System;
 using System.Collections;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Monster : Character
 {
     [Header("Variables")]
     [SerializeField] private float MOVE_SPEED = 1;
 
-    public TextAni TxtHit;
+    public TextAni txtHit;
+    public Image imgHp;
+    public Image imgHp2;
 
     private int curTargetIdx = 0;
     private Vector2 curTarget;
 
-    public int hp = 100;
     private bool isDead = false;
+
+    public int HP = 0, MaxHP = 100;
 
     protected override void Start()
     {
         base.Start();
+        HP = MaxHP;
 
         InitTarget();
     }
@@ -27,6 +32,8 @@ public class Monster : Character
 
     private void Update()
     {
+        imgHp2.fillAmount = Mathf.Lerp(imgHp2.fillAmount, imgHp.fillAmount, Time.deltaTime * 2.0f);
+
         if (isDead) return;
 
         // Move
@@ -112,10 +119,11 @@ public class Monster : Character
     {
         if (isDead) return;
 
-        hp -= dmg;
-        Instantiate(TxtHit, transform.position, Quaternion.identity).Initialize(dmg);
+        HP -= dmg;
+        imgHp.fillAmount = (float)HP / MaxHP;
+        Instantiate(txtHit, transform.position, Quaternion.identity).Initialize(dmg);
         
-        if(hp <= 0)
+        if(HP <= 0)
         {
             isDead = true;
             gameObject.layer = LayerMask.NameToLayer("Default");
@@ -126,6 +134,7 @@ public class Monster : Character
 
     IEnumerator CDead()
     {
+        imgHp.transform.parent.gameObject.SetActive(false);
         float alpha = 1.0f;
         while(sprRr.color.a > 0.0f)
         {
