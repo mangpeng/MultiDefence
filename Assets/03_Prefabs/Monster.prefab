@@ -245,6 +245,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MOVE_SPEED: 1
+  TxtHit: {fileID: -7755103875668660667, guid: 76c52f8687f0fd244b6b4233398fc63a, type: 3}
+  hp: 100
 --- !u!58 &6866084378737591108
 CircleCollider2D:
   m_ObjectHideFlags: 0

@@ -8,6 +8,7 @@ public class Monster : Character
     [Header("Variables")]
     [SerializeField] private float MOVE_SPEED = 1;
 
+    public TextAni TxtHit;
 
     private int curTargetIdx = 0;
     private Vector2 curTarget;
@@ -112,6 +113,8 @@ public class Monster : Character
         if (isDead) return;
 
         hp -= dmg;
+        Instantiate(TxtHit, transform.position, Quaternion.identity).Initialize(dmg);
+        
         if(hp <= 0)
         {
             isDead = true;
