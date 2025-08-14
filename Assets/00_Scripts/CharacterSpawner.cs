@@ -1,25 +1,32 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CharacterSpawner : MonoBehaviour
 {
-    const int GRID_X_COUNT = 6;
-    const int GRID_Y_COUNT = 3;
+    private const int GRID_X_COUNT = 6;
+    private const int GRID_Y_COUNT = 3;
+
+    [Header("Variables")]
+    [SerializeField] private float MONSTER_SPAWN_INTERVAL = 1.0f;
 
     [SerializeField] private GameObject prefPlayer;
+    [SerializeField] private Monster prefMonster;
+
+    public static List<Vector2> monsterMoveList = new List<Vector2>();
 
     private List<Vector2> spawnList = new List<Vector2>();
     private List<bool> spawnedList = new List<bool>(); // 소한된 위치 정보
 
     void Start()
     {
-        GridStart();
-    }
+        for(int i = 0; i < transform.childCount; i++)
+        {
+            monsterMoveList.Add(transform.GetChild(i).position);
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        GridStart();
+        StartCoroutine(CSpawnMonster());
     }
 
     #region Make Grid
@@ -46,6 +53,7 @@ public class CharacterSpawner : MonoBehaviour
     }
     #endregion
 
+    #region SummonCharacter
     public void Summon()
     {
         int positionValue = -1;
@@ -68,4 +76,17 @@ public class CharacterSpawner : MonoBehaviour
             player.transform.position = newPos;
         }
     }
+    #endregion
+
+    #region SummonMonster
+    IEnumerator CSpawnMonster()
+    {
+        var monster = Instantiate(prefMonster, monsterMoveList[0], Quaternion.identity);
+        if(monster == null)
+            yield break;
+
+        yield return new WaitForSeconds(MONSTER_SPAWN_INTERVAL);
+        StartCoroutine(CSpawnMonster());
+    }
+    #endregion
 }
