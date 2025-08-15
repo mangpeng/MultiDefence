@@ -126,6 +126,8 @@ public class Monster : Character
         if(HP <= 0)
         {
             isDead = true;
+            GameManager.instance.GetMoney(1);
+            GameManager.instance.RemoveMonster(this);
             gameObject.layer = LayerMask.NameToLayer("Default");
             AnimChange("DEAD", true);
             StartCoroutine(CDead());

@@ -56,6 +56,12 @@ public class CharacterSpawner : MonoBehaviour
     #region SummonCharacter
     public void Summon()
     {
+        if (GameManager.instance.Money < GameManager.instance.SummonCount)
+            return;
+
+        GameManager.instance.Money -= GameManager.instance.SummonCount;
+        GameManager.instance.SummonCount += 2;
+
         int positionValue = -1;
 
         for (int i =0 ; i < spawnedList.Count; i++)
@@ -82,6 +88,7 @@ public class CharacterSpawner : MonoBehaviour
     IEnumerator CSpawnMonster()
     {
         var monster = Instantiate(prefMonster, monsterMoveList[0], Quaternion.identity);
+        GameManager.instance.AddMonster(monster);
         if(monster == null)
             yield break;
 
