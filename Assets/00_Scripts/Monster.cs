@@ -1,5 +1,7 @@
+using NUnit.Framework;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,7 +19,7 @@ public class Monster : Character
     private Vector2 curTarget;
 
     private bool isDead = false;
-
+    List<Vector2> moveList = new();
     public int HP = 0, MaxHP = 100;
 
     protected override void Start()
@@ -28,7 +30,10 @@ public class Monster : Character
         InitTarget();
     }
 
-
+    public void Init(List<Vector2> moveList)
+    {
+        this.moveList = moveList;
+    }
 
     private void Update()
     {
@@ -40,7 +45,7 @@ public class Monster : Character
         transform.position = Vector2.MoveTowards(transform.position, curTarget, Time.deltaTime * MOVE_SPEED);
 
         // Check next target and Change
-        if(CanChangeTarget())
+        if (CanChangeTarget())
         {
             curTargetIdx = GetNextTargetIndex();
             ChangeCurrentTarget(curTargetIdx);
@@ -50,13 +55,13 @@ public class Monster : Character
     #region Target
     private void InitTarget()
     {
-        if (curTargetIdx >= CharacterSpawner.monsterMoveList.Count)
+        if (curTargetIdx >= moveList.Count)
         {
-            Debug.LogError($"Invalid move target idx. index: {curTargetIdx}, targetListCount: {CharacterSpawner.monsterMoveList.Count}");
+            Debug.LogError($"Invalid move target idx. index: {curTargetIdx}, targetListCount: {moveList.Count}");
             return;
         }
 
-        var target = CharacterSpawner.monsterMoveList[curTargetIdx];
+        var target = moveList[curTargetIdx];
         if (target == null)
         {
             Debug.LogError($"MoveTarget is null. targetIndex: {curTargetIdx}");
@@ -70,13 +75,13 @@ public class Monster : Character
     {
         // Check valid next target index
         var nextTargetIdx = GetNextTargetIndex();
-        if (nextTargetIdx >= CharacterSpawner.monsterMoveList.Count)
+        if (nextTargetIdx >= moveList.Count)
         {
-            Debug.LogWarning($"Invalid move target idx. index: {nextTargetIdx}, targetListCount: {CharacterSpawner.monsterMoveList.Count}");
+            Debug.LogWarning($"Invalid move target idx. index: {nextTargetIdx}, targetListCount: {moveList.Count}");
             return false;
         }
 
-        var nextTarget = CharacterSpawner.monsterMoveList[nextTargetIdx];
+        var nextTarget = moveList[nextTargetIdx];
         if (nextTarget == null)
         {
             Debug.LogWarning($"MoveTarget is null. targetIndex: {nextTargetIdx}");
@@ -92,13 +97,13 @@ public class Monster : Character
 
     private void ChangeCurrentTarget(int targetIdx)
     {
-        if (targetIdx >= CharacterSpawner.monsterMoveList.Count)
+        if (targetIdx >= moveList.Count)
         {
-            Debug.LogWarning($"Invalid move target idx. index: {targetIdx}, targetListCount: {CharacterSpawner.monsterMoveList.Count}");
+            Debug.LogWarning($"Invalid move target idx. index: {targetIdx}, targetListCount: {moveList.Count}");
             return;
         }
 
-        var target = CharacterSpawner.monsterMoveList[targetIdx];
+        var target = moveList[targetIdx];
         if (target == null)
         {
             Debug.LogWarning($"MoveTarget is null. targetIndex: {targetIdx}");
@@ -111,7 +116,7 @@ public class Monster : Character
 
     private int GetNextTargetIndex()
     {
-        return (curTargetIdx + 1) % CharacterSpawner.monsterMoveList.Count;
+        return (curTargetIdx + 1) % moveList.Count;
     }
     #endregion
 
