@@ -87,14 +87,17 @@ public class Spawner : NetworkBehaviour
         //GameManager.instance.Money -= GameManager.instance.SummonCount;
         //GameManager.instance.SummonCount += 2;
 
-        if (IsClient)
-        {
-            ServerHeroSpawnServerRpc(LocalID());
-        }
-        else
-        {
-            HeroSpawn(LocalID());
-        }
+
+        //if (IsClient)
+        //{
+        //    ServerHeroSpawnServerRpc(LocalID());
+        //}
+        //else
+        //{
+        //    HeroSpawn(LocalID());
+        //}
+        
+        ServerHeroSpawnServerRpc(LocalID());
     }
 
     private void HeroSpawn(ulong clientid)
@@ -103,7 +106,10 @@ public class Spawner : NetworkBehaviour
         NetworkObject netObj = hero.GetComponent<NetworkObject>();
         netObj.Spawn();
 
-        ClientHeroSpawnClientRpc(netObj.NetworkObjectId, clientid);
+        HeroStat[] datas = Resources.LoadAll<HeroStat>("HeroData");
+        var data = datas[UnityEngine.Random.Range(0, datas.Length)];
+
+        ClientHeroSpawnClientRpc(netObj.NetworkObjectId, clientid, data.GetData());
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -113,11 +119,12 @@ public class Spawner : NetworkBehaviour
     }
 
     [ClientRpc]
-    private void ClientHeroSpawnClientRpc(ulong netObjId, ulong clientid)
+    private void ClientHeroSpawnClientRpc(ulong netObjId, ulong clientid, HeroStatData data)
     {
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(netObjId, out NetworkObject heroNetObj))
         {
             bool isPlayer = NetworkManager.Singleton.LocalClientId == clientid;
+            heroNetObj.GetComponent<Hero>().Initdata(data);
             SetPositionHero(heroNetObj, isPlayer);
         }
     }
@@ -146,6 +153,9 @@ public class Spawner : NetworkBehaviour
     #region SummonMonster
     IEnumerator CSpawnMonster()
     {
+        // 서버에서 이미 몬스터 경로 정보 읽어서 스폰해서 클라한테 알리지만 클라는 몬스터 경로 정보 읽지 못해서 클라에서 에러나서 임시로 최초 스폰 딜레이 줌
+        yield return new WaitForSeconds(3.0f);
+
         // yield return new WaitForSeconds(MONSTER_SPAWN_INTERVAL);
 
         //if (IsClient)

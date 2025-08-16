@@ -23,11 +23,9 @@ public class Monster : Character
     List<Vector2> moveList = new();
     public int HP = 0, MaxHP = 100;
 
-    protected override void Start()
+    protected void Start()
     {
-        base.Start();
         HP = MaxHP;
-
         InitTarget();
     }
 

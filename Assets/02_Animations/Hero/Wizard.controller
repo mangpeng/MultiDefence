@@ -49,7 +49,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: c2c0da57e9146e845aae9dc278d712f2, type: 2}
+  m_Motion: {fileID: 7400000, guid: cf36f2c8bbe73044888db34c4f634cdd, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -89,7 +89,7 @@ AnimatorController:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Player
+  m_Name: Wizard
   serializedVersion: 5
   m_AnimatorParameters:
   - m_Name: ATTACK
@@ -144,7 +144,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 56ffb80209102c848b4fc4fb38f86c83, type: 2}
+  m_Motion: {fileID: 7400000, guid: 7f86dc6e451bdb74f9920f8c73c0cfac, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -247,7 +247,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 9f8b179aa32b7e94ebe530cc32fb6c77, type: 2}
+  m_Motion: {fileID: 7400000, guid: 62ea21add0402db468a4602970c534bc, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 

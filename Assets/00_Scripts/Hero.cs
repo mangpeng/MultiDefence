@@ -5,15 +5,25 @@ using UnityEngine;
 
 public class Hero : Character
 {
+    public int ATK;
     [SerializeField] private float attackRange = 1.0f;
     private float attackSpeed = 0.0f;
 
     private Transform attackTarget = null;
     private LayerMask enemyLayer;
+    public HeroStat m_Data;
 
-    protected override void Start()
+    public void Initdata(HeroStatData data)
     {
-        base.Start();
+        attackRange = data.heroRange;
+        ATK = data.heroAtk;
+        attackSpeed = data.heroAtk_speed;
+        GetInitCharacter(data.heroName);
+    }
+
+    protected override void Awake()
+    {
+        base.Awake();
         enemyLayer = LayerMask.GetMask("Monster");        
     }
 
@@ -84,7 +94,7 @@ public class Hero : Character
             if (monster == null)
                 return;
 
-            monster.GetDamage(10);
+            monster.GetDamage(ATK);
         }
     }
 
