@@ -16,7 +16,7 @@ public class UIMain : MonoBehaviour
     }
     private void Update()
     {
-        txtMonsterCount.text = $"{GameManager.instance.Monsters.Count.ToString()} / 100";
+        txtMonsterCount.text = $"{GameManager.instance.MonsterCount.ToString()} / 100";
         txtSummon.text = GameManager.instance.SummonCount.ToString();
         txtMoney.text = GameManager.instance.Money.ToString();    
         txtSummon.color = GameManager.instance.Money >= GameManager.instance.SummonCount ? Color.white : Color.gray;

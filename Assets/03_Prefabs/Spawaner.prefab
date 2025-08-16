@@ -112,7 +112,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0.4251958, g: 0.990566, b: 0.52285904, a: 1}
+  m_Color: {r: 0.16767533, g: 0.2264151, b: 0.17780288, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -203,7 +203,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0.4251958, g: 0.990566, b: 0.52285904, a: 1}
+  m_Color: {r: 0.16767533, g: 0.2264151, b: 0.17780288, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -317,7 +317,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  MONSTER_SPAWN_INTERVAL: 10
+  MONSTER_SPAWN_INTERVAL: 1
   prefPlayer: {fileID: 4480561131397840941, guid: 4df6f44a6cc76ed40a81a2eaa1e0ceca, type: 3}
   prefMonster: {fileID: 5170184945953356536, guid: 8e980e18cc3b86d41b20ac1c59a52de9, type: 3}
   myMonsterMoveList: []

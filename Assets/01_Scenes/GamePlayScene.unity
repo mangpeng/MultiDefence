@@ -417,8 +417,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: CharacterSpawner, Assembly-CSharp
+      - m_Target: {fileID: 6299955892392664020}
+        m_TargetAssemblyTypeName: Spawner, Assembly-CSharp
         m_MethodName: Summon
         m_Mode: 1
         m_Arguments:
@@ -438,6 +438,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 430092347}
+  - component: {fileID: 430092348}
   - component: {fileID: 430092346}
   m_Layer: 0
   m_Name: Manager
@@ -458,9 +459,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 675a2d6734e92424d9b632e2f21a4402, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   Money: 1000
   SummonCount: 20
   Monsters: []
+  MonsterCount: 0
 --- !u!4 &430092347
 Transform:
   m_ObjectHideFlags: 0
@@ -476,6 +479,31 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &430092348
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 430092345}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 3159366609
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!1 &463206239
 GameObject:
   m_ObjectHideFlags: 0
@@ -1812,6 +1840,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c9bad1789bcd8e84fa2d15c4c8e5c51f, type: 3}
+--- !u!114 &6299955892392664020 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8015913039571994389, guid: c9bad1789bcd8e84fa2d15c4c8e5c51f, type: 3}
+  m_PrefabInstance: {fileID: 6299955892392664019}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e57877a9d05c1fc41af0898b230f6690, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

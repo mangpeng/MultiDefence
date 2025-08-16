@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Linq;
+using Unity.Netcode;
 using UnityEngine;
 
 public class Hero : Character
@@ -47,20 +48,23 @@ public class Hero : Character
             if(attackSpeed >= 1.0f)
             {
                 attackSpeed = 0.0f;
-                Attack(attackTarget);
+                AnimChange("ATTACK", true);
+                CS_AttackMonsterServerRpc(attackTarget.GetComponent<NetworkObject>().NetworkObjectId);
             }
         }
     }
 
-    private void Attack(Transform target)
-    {
-        Debug.Log("Attack");
-        Debug.DrawLine(transform.position, target.position, Color.blue, 0.5f);
-        AnimChange("ATTACK", true);
+    //private void Attack(Transform target)
+    //{
+    //    if(target == null) return;  
 
-        var monster = target.GetComponent<Monster>();
-        monster.GetDamage(10);
-    }
+    //    Debug.Log("Attack");
+    //    Debug.DrawLine(transform.position, target.position, Color.blue, 0.5f);
+    //    AnimChange("ATTACK", true);
+
+    //    var monster = target.GetComponent<Monster>();
+    //    monster.GetDamage(10);
+    //}
 
     private void OnDrawGizmosSelected()
     {
@@ -69,4 +73,20 @@ public class Hero : Character
 
 
     }
+
+    #region Network
+    [ServerRpc(RequireOwnership = false)]
+    private void CS_AttackMonsterServerRpc(ulong targetId)
+    {
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(targetId, out var netObj))
+        {
+            var monster = netObj.GetComponent<Monster>();
+            if (monster == null)
+                return;
+
+            monster.GetDamage(10);
+        }
+    }
+
+    #endregion
 }

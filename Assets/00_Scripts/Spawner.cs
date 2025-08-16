@@ -61,7 +61,7 @@ public class Spawner : NetworkBehaviour
             for (int col = 0; col < GRID_X_COUNT; col++)
             {
                 float posX = (-parentSpriteWidth / 2) + (col * gridWidth) + (gridWidth / 2);
-                float posY = (parentSpriteHeight / 2) - (row * gridHeight) + (gridHeight / 2);
+                float posY = ((isPlayer ? parentSpriteHeight : -parentSpriteHeight) / 2) + ((isPlayer ? -1 : 1 ) * (row * gridHeight)) + (gridHeight / 2);
 
                 if (isPlayer)
                 {
@@ -70,7 +70,7 @@ public class Spawner : NetworkBehaviour
                 }
                 else
                 {
-                    otherSpawnList.Add(new Vector2(posX, posY + tr.position.y - gridHeight));
+                    otherSpawnList.Add(new Vector2(posX, posY + tr.position.y));
                     otherSpawnedList.Add(false);
                 }
             }
@@ -81,70 +81,104 @@ public class Spawner : NetworkBehaviour
     #region SummonCharacter
     public void Summon()
     {
-        if (GameManager.instance.Money < GameManager.instance.SummonCount)
-            return;
+        //if (GameManager.instance.Money < GameManager.instance.SummonCount)
+        //    return;
 
-        GameManager.instance.Money -= GameManager.instance.SummonCount;
-        GameManager.instance.SummonCount += 2;
+        //GameManager.instance.Money -= GameManager.instance.SummonCount;
+        //GameManager.instance.SummonCount += 2;
+
+        if (IsClient)
+        {
+            ServerHeroSpawnServerRpc(LocalID());
+        }
+        else
+        {
+            HeroSpawn(LocalID());
+        }
+    }
+
+    private void HeroSpawn(ulong clientid)
+    {
+        var hero = Instantiate(prefPlayer);
+        NetworkObject netObj = hero.GetComponent<NetworkObject>();
+        netObj.Spawn();
+
+        ClientHeroSpawnClientRpc(netObj.NetworkObjectId, clientid);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void ServerHeroSpawnServerRpc(ulong clientid)
+    {
+        HeroSpawn(clientid);
+    }
+
+    [ClientRpc]
+    private void ClientHeroSpawnClientRpc(ulong netObjId, ulong clientid)
+    {
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(netObjId, out NetworkObject heroNetObj))
+        {
+            bool isPlayer = NetworkManager.Singleton.LocalClientId == clientid;
+            SetPositionHero(heroNetObj, isPlayer);
+        }
+    }
+
+    private void SetPositionHero(NetworkObject netObj, bool Player)
+    {
+        List<bool> spawnedList = Player ? mySpawnedList : otherSpawnedList;
+        List<Vector2> spawnList = Player ? mySpawnList : otherSpawnList;
 
         int positionValue = -1;
-
-        for (int i =0 ; i < mySpawnedList.Count; i++)
+        for (int i = 0; i < spawnedList.Count; i++)
         {
-            if (mySpawnedList[i] == false)
+            if (spawnedList[i] == false)
             {
                 positionValue = i;
-                mySpawnedList[i] = true;
+                spawnedList[i] = true;
                 break;
             }
         }
 
-        if(positionValue != -1)
-        {
-            var player = Instantiate(prefPlayer);
-            
-            var newPos = mySpawnList[positionValue];
-            player.transform.position = newPos;
-        }
+        netObj.transform.position = spawnList[positionValue];
     }
+
     #endregion
 
     #region SummonMonster
     IEnumerator CSpawnMonster()
     {
-        yield return new WaitForSeconds(MONSTER_SPAWN_INTERVAL);
+        // yield return new WaitForSeconds(MONSTER_SPAWN_INTERVAL);
 
-        if (IsClient)
-        {
-            ServerMonsterSpawnServerRpc(NetworkManager.Singleton.LocalClientId);
-        }
-        else
-        {
-            MonsterSpawn(NetworkManager.Singleton.LocalClientId);
-        }
+        //if (IsClient)
+        //{
+        //    ServerMonsterSpawnServerRpc(NetworkManager.Singleton.LocalClientId);
+        //}
+        //else
+        //{
+        //    MonsterSpawn(NetworkManager.Singleton.LocalClientId);
+        //}
 
+        if (!IsServer) yield break;
+
+        while (true)
+        {
+            yield return new WaitForSeconds(MONSTER_SPAWN_INTERVAL);
+
+            for (int i = 0; i < NetworkManager.ConnectedClients.Count; i++)
+            {
+                var monster = Instantiate(prefMonster);
+                NetworkObject netObj = monster.GetComponent<NetworkObject>();
+                netObj.Spawn();
+
+                GameManager.instance.AddMonster(monster);
+                BC_MonsterSpawnClientRpc(netObj.NetworkObjectId, (ulong)i);
+            }
+        }
         
-        StartCoroutine(CSpawnMonster());
-    }
-
-    [ServerRpc(RequireOwnership = false)]
-    private void ServerMonsterSpawnServerRpc(ulong clientid)
-    {
-        MonsterSpawn(clientid);
-    }
-
-    private void MonsterSpawn(ulong clientid)
-    {
-        var monster = Instantiate(prefMonster);
-
-        NetworkObject netObj = monster.GetComponent<NetworkObject>();
-        netObj.Spawn();
-
-        ClientMonsterSpawnClientRpc(netObj.NetworkObjectId, clientid);
+        // StartCoroutine(CSpawnMonster());
     }
 
     [ClientRpc]
-    private void ClientMonsterSpawnClientRpc(ulong netObjId, ulong clientid)
+    private void BC_MonsterSpawnClientRpc(ulong netObjId, ulong clientid)
     {
         if(NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(netObjId, out NetworkObject monsterNetObj))
         {
@@ -160,5 +194,11 @@ public class Spawner : NetworkBehaviour
             }
         }
     }
+
+    private ulong LocalID()
+    {
+        return NetworkManager.Singleton.LocalClientId;
+    }
+
     #endregion
 }

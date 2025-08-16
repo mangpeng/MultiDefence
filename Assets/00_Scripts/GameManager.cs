@@ -1,10 +1,11 @@
 using NUnit.Framework;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public delegate void OnMoneyEventHandler();
 
-public class GameManager : MonoBehaviour
+public class GameManager : NetworkBehaviour
 {
     public static GameManager instance;
 
@@ -20,6 +21,7 @@ public class GameManager : MonoBehaviour
     public int SummonCount = 20;
 
     public List<Monster> Monsters = new();
+    public int MonsterCount;
 
     public event OnMoneyEventHandler OnMoney;
 
@@ -32,11 +34,20 @@ public class GameManager : MonoBehaviour
     public void AddMonster(Monster m)
     {
         Monsters.Add(m);
+        MonsterCount++;
+        BC_ClientMonsterCount_ClientRpc(MonsterCount);
     }
 
     public void RemoveMonster(Monster m)
     {
         Monsters.Remove(m);
+        MonsterCount--;
+        BC_ClientMonsterCount_ClientRpc(MonsterCount);
     }
 
+    [ClientRpc]
+    private void BC_ClientMonsterCount_ClientRpc(int count)
+    {
+        MonsterCount = count;
+    }
 }

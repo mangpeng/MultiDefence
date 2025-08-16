@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -42,6 +43,9 @@ public class Monster : Character
         if (isDead) return;
 
         // Move
+        if (moveList.Count == 0)
+            return;
+
         transform.position = Vector2.MoveTowards(transform.position, curTarget, Time.deltaTime * MOVE_SPEED);
 
         // Check next target and Change
@@ -122,21 +126,36 @@ public class Monster : Character
 
     public void GetDamage(int dmg)
     {
+        if (!IsServer) return;
         if (isDead) return;
 
         HP -= dmg;
-        imgHp.fillAmount = (float)HP / MaxHP;
-        Instantiate(txtHit, transform.position, Quaternion.identity).Initialize(dmg);
-        
-        if(HP <= 0)
+
+        isDead = HP <= 0;
+
+        if(isDead)
         {
-            isDead = true;
-            GameManager.instance.GetMoney(1);
+            BC_Dead_ClientRpc(HP, dmg);
+
+            // 서버에서 삭제
+            // 주의! 서버에서 미리 삭제하면 ClientRpc는 작동 안함
+            //NetworkObject.Despawn(false);
             GameManager.instance.RemoveMonster(this);
-            gameObject.layer = LayerMask.NameToLayer("Default");
-            AnimChange("DEAD", true);
-            StartCoroutine(CDead());
+            StartCoroutine(CoDespawnAfter(1.0f));
+        } else
+        {
+            BC_Hit_ClientRpc(HP, dmg);
         }
+    }
+
+    IEnumerator CoDespawnAfter(float t)
+    {
+        // 최소한 한 프레임은 기다리기 (t가 0이어도 null 한번)
+        if (t <= 0f) yield return null;
+        else yield return new WaitForSeconds(t);
+
+        if (NetworkObject && NetworkObject.IsSpawned)
+            NetworkObject.Despawn(true);
     }
 
     IEnumerator CDead()
@@ -153,7 +172,41 @@ public class Monster : Character
 
             yield return null;
         }
+        
 
-        Destroy(this.gameObject);
+        // Destroy(this);
+        // Debug.Log($"{NetworkManager.Singleton.LocalClientId} {NetworkObjectId}");
     }
+
+    #region Network
+    // C->S => CS
+    // S->C => SC
+    // S-> All C => BC
+    // S-> C ... C => SCC
+
+    [ClientRpc]
+    private void BC_Hit_ClientRpc(int hp, int dmg, ClientRpcParams rpcParams = default)
+    {
+        HP = hp;
+        imgHp.fillAmount = (float)HP / MaxHP;
+
+        Instantiate(txtHit, transform.position, Quaternion.identity).Initialize(dmg);
+    }
+
+    [ClientRpc]
+    private void BC_Dead_ClientRpc(int hp, int dmg, ClientRpcParams rpcParams = default)
+    {
+        isDead = true;
+        gameObject.layer = LayerMask.NameToLayer("Default");
+        AnimChange("DEAD", true);
+        StartCoroutine(CDead());
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SC_MonsterDeadServerRpc()
+    {
+        NetworkManager.Destroy(this);
+    }
+
+    #endregion
 }
