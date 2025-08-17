@@ -15,5 +15,5 @@ MonoBehaviour:
   Name: Wizard
   ATK: 20
   ATK_Speed: 0.5
-  Range: 2
+  Range: 1.5
   animatorController: {fileID: 9100000, guid: 2d6f998e3dc9b6549a9b522b35810935, type: 2}

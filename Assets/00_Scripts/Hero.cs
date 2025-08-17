@@ -13,11 +13,14 @@ public class Hero : Character
     private LayerMask enemyLayer;
     public HeroStat m_Data;
 
-    public void Initdata(HeroStatData data)
+    public HeroHolder parentHolder;
+
+    public void Initdata(HeroStatData data, HeroHolder holder)
     {
         attackRange = data.heroRange;
         ATK = data.heroAtk;
         attackSpeed = data.heroAtk_speed;
+        parentHolder = holder;
         GetInitCharacter(data.heroName);
     }
 
@@ -34,7 +37,7 @@ public class Hero : Character
 
     private void CheckForEnemies()
     {
-        Collider2D[] colEnemies = Physics2D.OverlapCircleAll(transform.position, attackRange, enemyLayer);
+        Collider2D[] colEnemies = Physics2D.OverlapCircleAll(parentHolder.transform.position, attackRange, enemyLayer);
 
         if (colEnemies.Length == 0)
             return;
@@ -76,13 +79,11 @@ public class Hero : Character
     //    monster.GetDamage(10);
     //}
 
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, attackRange);
-
-
-    }
+    //private void OnDrawGizmosSelected()
+    //{
+    //    Gizmos.color = Color.red;
+    //    Gizmos.DrawWireSphere(parentHolder.transform.position, attackRange);
+    //}
 
     #region Network
     [ServerRpc(RequireOwnership = false)]

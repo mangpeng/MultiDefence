@@ -15,5 +15,5 @@ MonoBehaviour:
   Name: Archer
   ATK: 5
   ATK_Speed: 2
-  Range: 2
+  Range: 1
   animatorController: {fileID: 9100000, guid: b15421697b5fc49469f1a12d6f9debb1, type: 2}

@@ -15,5 +15,5 @@ MonoBehaviour:
   Name: Warrior
   ATK: 10
   ATK_Speed: 1
-  Range: 1
+  Range: 0.6
   animatorController: {fileID: 9100000, guid: c1a836430fba3f241a4aa25dea14a035, type: 2}

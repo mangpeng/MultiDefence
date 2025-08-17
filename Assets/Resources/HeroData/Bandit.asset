@@ -15,5 +15,5 @@ MonoBehaviour:
   Name: Bandit
   ATK: 10
   ATK_Speed: 1.5
-  Range: 1
+  Range: 0.5
   animatorController: {fileID: 9100000, guid: 0200f52f14b95e843b3bdc63e9799c3d, type: 2}
