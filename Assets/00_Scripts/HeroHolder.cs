@@ -61,7 +61,32 @@ public class HeroHolder : NetworkBehaviour
     {
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(netObjId, out NetworkObject heroNetObj))
         {
-            heroNetObj.transform.localPosition = Vector3.zero;
+            var parent = heroNetObj.transform.parent;
+            int siblingCount = parent.childCount;
+
+            if (siblingCount == 1)
+            {
+                parent.GetChild(0).transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
+                parent.GetChild(0).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 3;
+            } else if(siblingCount == 2)
+            {
+                parent.GetChild(0).transform.localPosition = new Vector3(-0.1f, 0.0f, 0.0f);
+                parent.GetChild(0).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 3;
+                parent.GetChild(1).transform.localPosition = new Vector3(0.1f, 0.0f, 0.0f);
+                parent.GetChild(0).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 4;
+            } else if(siblingCount == 3)
+            {
+                parent.GetChild(0).transform.localPosition = new Vector3(-0.1f, 0.05f, 0.0f);
+                parent.GetChild(0).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 3;
+                parent.GetChild(1).transform.localPosition = new Vector3(0.1f, 0.05f, 0.0f);
+                parent.GetChild(1).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 4;
+                parent.GetChild(2).transform.localPosition = new Vector3(0.0f, -0.05f, 0.0f);
+                parent.GetChild(2).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 5;
+            } else
+            {
+                // error
+            }
+
             heroNetObj.GetComponent<Hero>().Initdata(data);
         }
     }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Spawner : NetworkBehaviour
@@ -24,7 +25,7 @@ public class Spawner : NetworkBehaviour
     private List<Vector2> otherSpawnList = new List<Vector2>();
     private List<bool> otherSpawnedList = new List<bool>(); // 소한된 위치 정보
 
-    Dictionary<string, HeroHolder> dicHolder = new();
+    Dictionary<ulong/*clientID*/, List<HeroHolder>> dicHolder = new();
 
     public static float xValue, yValue;
 
@@ -118,21 +119,48 @@ public class Spawner : NetworkBehaviour
         HeroStat[] datas = Resources.LoadAll<HeroStat>("HeroData");
         var data = datas[UnityEngine.Random.Range(0, datas.Length)];
         
-        foreach(var dd in dicHolder)
+
+        if(!dicHolder.TryGetValue(clientid, out var heroHolders))
         {
-            if(dd.Value.Heros.Count < 3 && dd.Value.HolderName == data.Name)
+            dicHolder.Add(clientid, new());
+        }
+
+        bool isAdd = false;
+        dicHolder[clientid].ForEach((holder) =>
+        {
+            if(holder.HolderName == data.Name && holder.Heros.Count < 3)
             {
-                dd.Value.SpawnHeroHolder(data.GetData());
+                holder.SpawnHeroHolder(data.GetData());
+                isAdd = true;
                 return;
             }
-        }
-        
+        });
+
+        if (isAdd)
+            return;
+
         var h = Instantiate(spawnHolder);
-        dicHolder.Add(dicHolder.Count.ToString(), h.GetComponent<HeroHolder>());
+        dicHolder[clientid].Add(h.GetComponent<HeroHolder>());
         NetworkObject netObjHolder = h.GetComponent<NetworkObject>();
         netObjHolder.Spawn();
 
         ClientHeroHolderSpawnClientRpc(netObjHolder.NetworkObjectId, clientid, data.GetData());
+
+        //foreach(var dd in dicHolder)
+        //{
+        //    if(dd.Value.Heros.Count < 3 && dd.Value.HolderName == data.Name)
+        //    {
+        //        dd.Value.SpawnHeroHolder(data.GetData());
+        //        return;
+        //    }
+        //}
+
+        //var h = Instantiate(spawnHolder);
+        //// dicHolder.Add(dicHolder.Count.ToString(), h.GetComponent<HeroHolder>());
+        //NetworkObject netObjHolder = h.GetComponent<NetworkObject>();
+        //netObjHolder.Spawn();
+
+        //ClientHeroHolderSpawnClientRpc(netObjHolder.NetworkObjectId, clientid, data.GetData());
     }
 
     [ServerRpc(RequireOwnership = false)]

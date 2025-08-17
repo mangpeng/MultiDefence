@@ -58,7 +58,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -546.8959, y: -493, z: 1.1895393}
-  m_LocalScale: {x: 3.11, y: 2, z: 1}
+  m_LocalScale: {x: 3, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3807926611516258551}
@@ -149,7 +149,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -546.8959, y: -490.2, z: 1.1895393}
-  m_LocalScale: {x: 3.11, y: 2, z: 1}
+  m_LocalScale: {x: 3, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1835225264724175713}
@@ -317,7 +317,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  MONSTER_SPAWN_INTERVAL: 3
+  MONSTER_SPAWN_INTERVAL: 0.5
   spawnHolder: {fileID: 620002540745997267, guid: a1745f5ead4500d4ba7a865fbcb3db72, type: 3}
   prefMonster: {fileID: 5170184945953356536, guid: 8e980e18cc3b86d41b20ac1c59a52de9, type: 3}
   myMonsterMoveList: []
