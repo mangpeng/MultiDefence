@@ -12,7 +12,7 @@ public class Spawner : NetworkBehaviour
     [Header("Variables")]
     [SerializeField] private float MONSTER_SPAWN_INTERVAL = 1.0f;
 
-    [SerializeField] private GameObject prefPlayer;
+    [SerializeField] private GameObject spawnHolder;
     [SerializeField] private Monster prefMonster;
 
     public List<Vector2> myMonsterMoveList = new List<Vector2>();
@@ -23,6 +23,10 @@ public class Spawner : NetworkBehaviour
 
     private List<Vector2> otherSpawnList = new List<Vector2>();
     private List<bool> otherSpawnedList = new List<bool>(); // 소한된 위치 정보
+
+    Dictionary<string, HeroHolder> dicHolder = new();
+
+    public static float xValue, yValue;
 
     void Start()
     {
@@ -55,6 +59,11 @@ public class Spawner : NetworkBehaviour
 
         float gridWidth = tr.localScale.x / GRID_X_COUNT;
         float gridHeight = tr.localScale.y / GRID_Y_COUNT;
+
+        xValue = gridWidth;
+        yValue = gridHeight;
+
+        Debug.Log($"{xValue} {yValue}");
 
         for (int row = 0; row < GRID_Y_COUNT; row++)
         {
@@ -97,35 +106,51 @@ public class Spawner : NetworkBehaviour
         //    HeroSpawn(LocalID());
         //}
         
-        ServerHeroSpawnServerRpc(LocalID());
+        ServerHeroSpawnHolderServerRpc(LocalID());
     }
 
     private void HeroSpawn(ulong clientid)
     {
-        var hero = Instantiate(prefPlayer);
-        NetworkObject netObj = hero.GetComponent<NetworkObject>();
-        netObj.Spawn();
+        if (!IsServer)
+            return;
+
 
         HeroStat[] datas = Resources.LoadAll<HeroStat>("HeroData");
         var data = datas[UnityEngine.Random.Range(0, datas.Length)];
+        
+        foreach(var dd in dicHolder)
+        {
+            if(dd.Value.Heros.Count < 3 && dd.Value.HolderName == data.Name)
+            {
+                dd.Value.SpawnHeroHolder(data.GetData());
+                return;
+            }
+        }
+        
+        var h = Instantiate(spawnHolder);
+        dicHolder.Add(dicHolder.Count.ToString(), h.GetComponent<HeroHolder>());
+        NetworkObject netObjHolder = h.GetComponent<NetworkObject>();
+        netObjHolder.Spawn();
 
-        ClientHeroSpawnClientRpc(netObj.NetworkObjectId, clientid, data.GetData());
+        ClientHeroHolderSpawnClientRpc(netObjHolder.NetworkObjectId, clientid, data.GetData());
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void ServerHeroSpawnServerRpc(ulong clientid)
+    private void ServerHeroSpawnHolderServerRpc(ulong clientid)
     {
         HeroSpawn(clientid);
     }
 
     [ClientRpc]
-    private void ClientHeroSpawnClientRpc(ulong netObjId, ulong clientid, HeroStatData data)
+    private void ClientHeroHolderSpawnClientRpc(ulong netObjId, ulong clientid, HeroStatData data)
     {
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(netObjId, out NetworkObject heroNetObj))
         {
             bool isPlayer = NetworkManager.Singleton.LocalClientId == clientid;
-            heroNetObj.GetComponent<Hero>().Initdata(data);
+            Debug.Log(isPlayer);
             SetPositionHero(heroNetObj, isPlayer);
+            
+            heroNetObj.GetComponent<HeroHolder>().SpawnHeroHolder(data);
         }
     }
 
