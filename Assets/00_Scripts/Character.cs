@@ -19,13 +19,14 @@ public class Character : NetworkBehaviour
 
     protected void AnimChange(string temp, bool trigger)
     {
-        if(trigger)
+        if (trigger)
         {
             anim.SetTrigger(temp);
+            return;
         }
-        else
-        {
-            anim.SetBool(temp, true);
-        }
+
+        anim.SetBool("IDLE", false);
+        anim.SetBool("MOVE", false);
+        anim.SetBool(temp, true);
     }
 }

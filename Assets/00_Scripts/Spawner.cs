@@ -7,6 +7,15 @@ using UnityEngine;
 
 public class Spawner : NetworkBehaviour
 {
+    public static Spawner instance = null;
+    private void Awake()
+    {
+        if(instance == null)
+        {
+            instance = this;
+        }
+    }
+
     private const int GRID_X_COUNT = 6;
     private const int GRID_Y_COUNT = 3;
 
@@ -19,13 +28,13 @@ public class Spawner : NetworkBehaviour
     public List<Vector2> myMonsterMoveList = new List<Vector2>();
     public List<Vector2> otherMonsterMoveList = new List<Vector2>();
 
-    private List<Vector2> mySpawnList = new List<Vector2>();
+    public static List<Vector2> mySpawnList = new List<Vector2>();
     private List<bool> mySpawnedList = new List<bool>(); // 소한된 위치 정보
 
     private List<Vector2> otherSpawnList = new List<Vector2>();
     private List<bool> otherSpawnedList = new List<bool>(); // 소한된 위치 정보
 
-    Dictionary<ulong/*clientID*/, List<HeroHolder>> dicHolder = new();
+    public Dictionary<ulong/*clientID*/, List<HeroHolder>> dicHolder = new();
 
     public static float xValue, yValue;
 
@@ -63,8 +72,6 @@ public class Spawner : NetworkBehaviour
 
         xValue = gridWidth;
         yValue = gridHeight;
-
-        Debug.Log($"{xValue} {yValue}");
 
         for (int row = 0; row < GRID_Y_COUNT; row++)
         {
@@ -125,24 +132,27 @@ public class Spawner : NetworkBehaviour
             dicHolder.Add(clientid, new());
         }
 
-        bool isAdd = false;
+        bool isHolderAdded = false;
         dicHolder[clientid].ForEach((holder) =>
         {
             if(holder.HolderName == data.Name && holder.Heros.Count < 3)
             {
-                holder.SpawnHeroHolder(data.GetData());
-                isAdd = true;
+                holder.SpawnHeroHolder(data.GetData(), clientid);
+                isHolderAdded = true;
                 return;
             }
         });
 
-        if (isAdd)
+        if (isHolderAdded)
             return;
 
         var h = Instantiate(spawnHolder);
-        dicHolder[clientid].Add(h.GetComponent<HeroHolder>());
         NetworkObject netObjHolder = h.GetComponent<NetworkObject>();
         netObjHolder.Spawn();
+
+        var holder = h.GetComponent<HeroHolder>();
+        holder.GetComponent<HeroHolder>().idx = dicHolder[clientid].Count;
+        dicHolder[clientid].Add(holder.GetComponent<HeroHolder>());
 
         ClientHeroHolderSpawnClientRpc(netObjHolder.NetworkObjectId, clientid, data.GetData());
 
@@ -174,11 +184,23 @@ public class Spawner : NetworkBehaviour
     {
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(netObjId, out NetworkObject heroNetObj))
         {
-            bool isPlayer = NetworkManager.Singleton.LocalClientId == clientid;
-            Debug.Log(isPlayer);
+            bool isPlayer = NetworkManager.Singleton.LocalClientId == clientid;            
             SetPositionHero(heroNetObj, isPlayer);
-            
-            heroNetObj.GetComponent<HeroHolder>().SpawnHeroHolder(data);
+
+            // sync holders between server and client
+            if (!IsHost)
+            {
+                if (!dicHolder.TryGetValue(clientid, out var heroHolders))
+                {
+                    dicHolder.Add(clientid, new());
+                }
+
+                var holder = heroNetObj.GetComponent<HeroHolder>();
+                holder.GetComponent<HeroHolder>().idx = dicHolder[clientid].Count;
+                dicHolder[clientid].Add(holder.GetComponent<HeroHolder>());
+            }
+
+            heroNetObj.GetComponent<HeroHolder>().SpawnHeroHolder(data, clientid);
         }
     }
 
@@ -199,6 +221,42 @@ public class Spawner : NetworkBehaviour
         }
 
         netObj.transform.position = spawnList[positionValue];
+
+        netObj.GetComponent<HeroHolder>().pos = spawnList[positionValue];
+    }
+
+    public void SwapHoldersChanges(ulong clientId, int h1, int h2)
+    {
+        C2S_GetPosition_ServerRpc(clientId, h1, h2);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void C2S_GetPosition_ServerRpc(ulong clientId, int h1, int h2)
+    {
+        BC_GetPosition_ClientRpc(clientId, h1, h2);        
+    }
+
+    [ClientRpc]
+    private void BC_GetPosition_ClientRpc(ulong clientId, int h1, int h2)
+    {
+        GetPositionSet(clientId, h1, h2);
+    }
+
+    private void GetPositionSet(ulong clientId, int h1, int h2)
+    {
+        var holder1 = dicHolder[clientId][h1];
+        var holder2 = dicHolder[clientId][h2];
+
+        holder1.HeroChange(holder2);
+        holder2.HeroChange(holder1);
+
+        var tmp1 = holder1.Heros;
+        holder1.Heros = new List<Hero>(holder2.Heros);
+        holder2.Heros = new List<Hero>(tmp1);
+
+        var tmp2 = holder1.HolderName;
+        holder1.HolderName = holder2.HolderName;
+        holder2.HolderName = tmp2;
     }
 
     #endregion

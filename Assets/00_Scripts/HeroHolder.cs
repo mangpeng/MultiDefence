@@ -2,22 +2,75 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static UnityEditor.ShaderData;
 
 public class HeroHolder : NetworkBehaviour
 {
     [SerializeField] private Hero _spawnHero;
     [SerializeField] private Transform circleRange;
+    [SerializeField] private Transform square;
+    [SerializeField] private Transform circle;
 
     public string HolderName;
+    public ulong clientId;
     public List<Hero> Heros = new();
     public HeroStatData heroData;
+    public Vector2 pos;
+    public int idx;
 
     void Start()
     {
         var collider = gameObject.AddComponent<BoxCollider2D>();
         collider.isTrigger = true;
         collider.size = new Vector2(Spawner.xValue, Spawner.yValue);
+
+        square.transform.localScale = collider.size;
     }
+
+    public void HeroChange(HeroHolder holder)
+    {
+        List<Vector2> poss = new();
+
+        switch (Heros.Count)
+        {
+            case 1:
+                {
+                    poss = new List<Vector2>();
+                    poss.Add(new Vector2(0.0f, 0.0f));
+                    break;
+                }
+            case 2:
+                {
+                    poss = new List<Vector2>();
+                    poss.Add(new Vector2(-0.1f, 0.0f));
+                    poss.Add(new Vector2(0.1f, 0.0f));
+                    break;
+                }
+            case 3:
+                {
+                    poss = new List<Vector2>();
+                    poss.Add(new Vector2(-0.1f, 0.05f));
+                    poss.Add(new Vector2(0.1f, 0.05f));
+                    poss.Add(new Vector2(0.0f, -0.05f));
+                    break;
+                }
+        }
+
+        for (int i = 0; i < poss.Count; i++)
+        {
+            var worldPos = holder.transform.TransformPoint(poss[i]);
+            poss[i] = worldPos;
+        }
+
+        for (int i = 0; i < Heros.Count; i++)
+        {
+            Heros[i].ChangePosition(holder, poss, i);
+        }
+    }
+
+    public void ShowSquare(bool isShow) => square.gameObject.SetActive(isShow);
+    public void ShowCircle(bool isShow) => circle.gameObject.SetActive(isShow);
+    
 
     public void ShowRange()
     {
@@ -31,11 +84,12 @@ public class HeroHolder : NetworkBehaviour
         //circleRange.gameObject.SetActive(false);
     }
 
-    public void SpawnHeroHolder(HeroStatData data)
+    public void SpawnHeroHolder(HeroStatData data, ulong clientid)
     {
         if(Heros.Count == 0)
         {
             HolderName = data.heroName;
+            this.clientId = clientid;
         }
 
         // 클라들이 중복된 요청 서버에게 보내는 것을 처리하기 위해 임시처리.
@@ -57,7 +111,6 @@ public class HeroHolder : NetworkBehaviour
 
         NetworkObject netObj = go.GetComponent<NetworkObject>();
         netObj.Spawn();
-
         netObj.transform.parent = this.transform;
 
         ClientHeroSpawnClientRpc(netObj.NetworkObjectId, clientId, data);
@@ -78,34 +131,43 @@ public class HeroHolder : NetworkBehaviour
         {
             heroData = data;
 
+            
+
             var parent = heroNetObj.transform.parent;
             int siblingCount = parent.childCount;
 
-            // range 오브젝트 때문에 기본으로 자식 개수는 1
-            if (siblingCount == 2)
+            // 기본으로 자식 개수는 3
+            if (siblingCount == 4)
             {
-                parent.GetChild(1).transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
-                parent.GetChild(1).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 3;
-            } else if(siblingCount == 3)
+                parent.GetChild(3).transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
+                parent.GetChild(3).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 3;
+            } else if(siblingCount == 5)
             {
-                parent.GetChild(1).transform.localPosition = new Vector3(-0.1f, 0.0f, 0.0f);
-                parent.GetChild(1).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 3;
-                parent.GetChild(2).transform.localPosition = new Vector3(0.1f, 0.0f, 0.0f);
-                parent.GetChild(2).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 4;
-            } else if(siblingCount == 4)
+                parent.GetChild(3).transform.localPosition = new Vector3(-0.1f, 0.0f, 0.0f);
+                parent.GetChild(3).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 3;
+                parent.GetChild(4).transform.localPosition = new Vector3(0.1f, 0.0f, 0.0f);
+                parent.GetChild(4).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 4;
+            } else if(siblingCount == 6)
             {
-                parent.GetChild(1).transform.localPosition = new Vector3(-0.1f, 0.05f, 0.0f);
-                parent.GetChild(1).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 3;
-                parent.GetChild(2).transform.localPosition = new Vector3(0.1f, 0.05f, 0.0f);
-                parent.GetChild(2).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 4;
-                parent.GetChild(3).transform.localPosition = new Vector3(0.0f, -0.05f, 0.0f);
-                parent.GetChild(3).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 5;
+                parent.GetChild(3).transform.localPosition = new Vector3(-0.1f, 0.05f, 0.0f);
+                parent.GetChild(3).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 3;
+                parent.GetChild(4).transform.localPosition = new Vector3(0.1f, 0.05f, 0.0f);
+                parent.GetChild(4).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 4;
+                parent.GetChild(5).transform.localPosition = new Vector3(0.0f, -0.05f, 0.0f);
+                parent.GetChild(5).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 5;
             } else
             {
                 // error
             }
 
-            heroNetObj.GetComponent<Hero>().Initdata(data, this);
+            var hero = heroNetObj.GetComponent<Hero>();
+            hero.Initdata(data, this);
+
+            // sync holders between server and client
+            if(!IsHost)
+            {
+                Heros.Add(hero);
+            }
         }
     }
 

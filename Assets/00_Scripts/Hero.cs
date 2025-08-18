@@ -1,7 +1,10 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
+using UnityEditor.Rendering;
 using UnityEngine;
+using UnityEngine.InputSystem.Switch;
 
 public class Hero : Character
 {
@@ -14,6 +17,8 @@ public class Hero : Character
     public HeroStat m_Data;
 
     public HeroHolder parentHolder;
+
+    bool isMove = false;
 
     public void Initdata(HeroStatData data, HeroHolder holder)
     {
@@ -30,8 +35,56 @@ public class Hero : Character
         enemyLayer = LayerMask.GetMask("Monster");        
     }
 
+    public void ChangePosition(HeroHolder holder, List<Vector2> poss, int myIdx)
+    {
+        isMove = true;
+        AnimChange("MOVE", false);
+
+        parentHolder = holder;
+
+        // network object는 서버에서만 변경 가능
+        if(IsServer)
+        {
+            transform.parent = holder.transform;
+        }
+
+        // 왜 ? 로컬 위치로 비교하지??
+        int sign = (int)Mathf.Sign(poss[myIdx].x - transform.position.x);
+        switch (sign)
+        {
+            case -1: sprRr.flipX = true; break;
+            case 1: sprRr.flipX = false; break;
+        }
+
+        StartCoroutine(CMove(poss[myIdx]));
+    }
+
+    private IEnumerator CMove(Vector2 endPos)
+    {
+        float current = 0.0f;
+        float percent = 0.0f;
+        Vector2 start = transform.position;
+        Vector2 end = endPos;
+
+        while(percent < 1.0f)
+        {
+            current += Time.deltaTime;
+            percent = current / 0.5f;
+
+            Vector2 lerpPos = Vector2.Lerp(start, end, percent);
+            transform.position = lerpPos;
+            yield return null;
+        }
+
+        isMove = false;
+        AnimChange("IDLE", false);
+        sprRr.flipX = true;
+    }
+
     private void Update()
     {
+        if (isMove) return;
+
         CheckForEnemies();
     }
 
@@ -52,7 +105,6 @@ public class Hero : Character
         if (attackTarget != closestEnemy.transform)
         {
             attackTarget = closestEnemy.transform;
-            Debug.Log($"New target!! {attackTarget.name}");
         }
 
         attackSpeed += Time.deltaTime;
