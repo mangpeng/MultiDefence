@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UIElements;
 using static UnityEditor.ShaderData;
+using static UnityEngine.GraphicsBuffer;
 
 public class HeroHolder : NetworkBehaviour
 {
@@ -18,6 +20,9 @@ public class HeroHolder : NetworkBehaviour
     public Vector2 pos;
     public int idx;
 
+    public UnityEngine.UI.Button btnSell;
+    public UnityEngine.UI.Button btnCompose;
+
     void Start()
     {
         var collider = gameObject.AddComponent<BoxCollider2D>();
@@ -25,6 +30,31 @@ public class HeroHolder : NetworkBehaviour
         collider.size = new Vector2(Spawner.xValue, Spawner.yValue);
 
         square.transform.localScale = collider.size;
+
+        btnSell.onClick.AddListener(() => CS_Sell_ServerRpc());
+        // btnCompose.onClick.AddListener(() => CS_Sell_ServerRpc());
+
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void CS_Sell_ServerRpc()
+    {
+        var target = Heros.Last();
+        var netGo = NetworkManager.Singleton.SpawnManager.SpawnedObjects[target.NetworkObjectId];
+        BC_Sell_ClientRpc(netGo.NetworkObjectId);
+        netGo.Despawn(); // 이것도 위험해 보이는데...
+    }
+
+    [ClientRpc]
+    public void BC_Sell_ClientRpc(ulong netObjId)
+    {
+        var netGo = NetworkManager.Singleton.SpawnManager.SpawnedObjects[netObjId]; // 이것도 위험해 보이는데...
+        Heros.Remove(netGo.GetComponent<Hero>());
+    }
+
+    public void Composition()
+    {
+
     }
 
     public void HeroChange(HeroHolder holder)
@@ -75,13 +105,13 @@ public class HeroHolder : NetworkBehaviour
     public void ShowRange()
     {
         circleRange.localScale = new Vector3(heroData.heroRange * 2, heroData.heroRange * 2, 1);
-        //circleRange.gameObject.SetActive(true);
+        circleRange.gameObject.SetActive(true);
     }
 
     public void HideRange()
     {
-        circleRange.localScale = Vector3.zero;
-        //circleRange.gameObject.SetActive(false);
+        // circleRange.localScale = Vector3.zero;
+        circleRange.gameObject.SetActive(false);
     }
 
     public void SpawnHeroHolder(HeroStatData data, ulong clientid)

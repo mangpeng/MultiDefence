@@ -1,5 +1,6 @@
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class CameraRay : NetworkBehaviour
 {
@@ -8,6 +9,9 @@ public class CameraRay : NetworkBehaviour
 
     void Update()
     {
+        if (EventSystem.current.IsPointerOverGameObject())
+            return;
+
         if (Input.GetMouseButtonDown(0))
         {
             MouseButtonDown();
