@@ -21,9 +21,13 @@ public partial class NetManager : MonoBehaviour
     private string gamePlaySceneName = "GamePlayScene";
 
     public Button btnStartMatchmaking;
+    public Button btnCancelMatching;
+
     //public Button btnEnterLobby;
     //public TMP_InputField inputJoinCode;
     //public TextMeshProUGUI txtJoinCode;
+
+    public GameObject matchingObj;
      
     private async void Start()
     {

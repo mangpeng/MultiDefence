@@ -6,6 +6,7 @@ using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using Unity.Services.Relay;
 using UnityEngine;
+using WebSocketSharp;
 
 public partial class NetManager: MonoBehaviour
 {
@@ -143,8 +144,9 @@ public partial class NetManager: MonoBehaviour
             return;
         }
 
+        matchingObj.gameObject.SetActive(true);
         curLobby = await FindAvailableLobby();
-
+        
         if (curLobby == null)
         {
             await CreateNewLobby();
@@ -153,6 +155,8 @@ public partial class NetManager: MonoBehaviour
         {
             await JoinLobby(curLobby.Id);
         }
+
+        
     }
 
     private async Task<Lobby> FindAvailableLobby()
@@ -173,6 +177,27 @@ public partial class NetManager: MonoBehaviour
         return null;
     }
 
+    private async void DestroyLobby(string lobbyId)
+    {
+        try
+        {
+            if(!lobbyId.IsNullOrEmpty())
+            {
+                await LobbyService.Instance.DeleteLobbyAsync(lobbyId);
+            }
+
+            if (NetworkManager.Singleton.IsHost)
+            {
+                NetworkManager.Singleton.Shutdown();
+                matchingObj.SetActive(false);
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError(e);
+        }
+    }
+
     private async Task CreateNewLobby()
     {
         try
@@ -180,6 +205,8 @@ public partial class NetManager: MonoBehaviour
             curLobby = await LobbyService.Instance.CreateLobbyAsync("·£´ý ¸ÅÄª ¹æ", maxPlayers);
             Debug.Log("success to create new lobby" + curLobby.Id);
             await AllocateRelayServerAndJoin(curLobby);
+            btnCancelMatching.onClick.RemoveAllListeners();
+            btnCancelMatching.onClick.AddListener(() => DestroyLobby(curLobby.Id));
             //StartHost();
 
         }
