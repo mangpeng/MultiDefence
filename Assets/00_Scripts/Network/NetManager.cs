@@ -20,9 +20,10 @@ public partial class NetManager : MonoBehaviour
     private const int maxPlayers = 2;
     private string gamePlaySceneName = "GamePlayScene";
 
-    public Button btnStartMatchmaking, btnEnterLobby;
-    public TMP_InputField inputJoinCode;
-    public TextMeshProUGUI txtJoinCode;
+    public Button btnStartMatchmaking;
+    //public Button btnEnterLobby;
+    //public TMP_InputField inputJoinCode;
+    //public TextMeshProUGUI txtJoinCode;
      
     private async void Start()
     {
@@ -32,7 +33,7 @@ public partial class NetManager : MonoBehaviour
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
         }
 
-        btnEnterLobby.onClick.AddListener(() => JoinGameWithCode(inputJoinCode.text));
+        // btnEnterLobby.onClick.AddListener(() => JoinGameWithCode(inputJoinCode.text));
         btnStartMatchmaking.onClick.AddListener(() => StartMatchmaking());
 
 

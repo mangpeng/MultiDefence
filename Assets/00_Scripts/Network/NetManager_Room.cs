@@ -217,7 +217,7 @@ public partial class NetManager: MonoBehaviour
             // https://discussions.unity.com/t/relay-troubleshooting-join-code-not-found/880750/8
             var code = await RelayService.Instance.GetJoinCodeAsync(alloc.AllocationId);
 
-            txtJoinCode.text = code;
+            // txtJoinCode.text = code;
 
             Debug.Log("success to allocate relay server. join code: " + code);
         }
