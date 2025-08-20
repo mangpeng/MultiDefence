@@ -1623,6 +1623,10 @@ PrefabInstance:
       propertyPath: GlobalObjectIdHash
       value: 1074757402
       objectReference: {fileID: 0}
+    - target: {fileID: 8015913039571994389, guid: c9bad1789bcd8e84fa2d15c4c8e5c51f, type: 3}
+      propertyPath: MONSTER_SPAWN_INTERVAL
+      value: 10
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

@@ -32,7 +32,7 @@ public class CameraRay : NetworkBehaviour
         var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         var hit = Physics2D.Raycast(ray.origin, ray.direction);
 
-        holder?.HideRange();
+        if(holder != null) holder.HideRange();
         holder = null;
 
         if (hit.collider != null)
@@ -57,7 +57,7 @@ public class CameraRay : NetworkBehaviour
         var hit = Physics2D.Raycast(ray.origin, ray.direction);
         if (hit.collider != null)
         {
-            colHolder?.ShowSquare(false);
+            if(colHolder != null) colHolder.ShowSquare(false);
 
             colHolder = hit.collider.GetComponent<HeroHolder>();
             if(colHolder != null && colHolder != holder)
@@ -81,7 +81,7 @@ public class CameraRay : NetworkBehaviour
                 var h = hit.collider.GetComponent<HeroHolder>();
                 if (h != null && h == holder)
                 {
-                    holder?.ShowRange();
+                    if (holder != null)  holder.ShowRange();
                 }
             }
         } else
@@ -92,8 +92,8 @@ public class CameraRay : NetworkBehaviour
             }
         }
 
-        holder?.ShowCircle(false);
-        colHolder?.ShowSquare(false);
+        if(holder != null) holder.ShowCircle(false);
+        if(colHolder != null) colHolder.ShowSquare(false);
 
         colHolder = null;
     }

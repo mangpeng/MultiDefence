@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Unity.Netcode;
 using Unity.VisualScripting;
@@ -29,10 +31,10 @@ public class Spawner : NetworkBehaviour
     public List<Vector2> otherMonsterMoveList = new List<Vector2>();
 
     public static List<Vector2> mySpawnList = new List<Vector2>();
-    private List<bool> mySpawnedList = new List<bool>(); // 소한된 위치 정보
+    public static List<bool> mySpawnedList = new List<bool>(); // 소한된 위치 정보
 
     private List<Vector2> otherSpawnList = new List<Vector2>();
-    private List<bool> otherSpawnedList = new List<bool>(); // 소한된 위치 정보
+    public static List<bool> otherSpawnedList = new List<bool>(); // 소한된 위치 정보
 
     public Dictionary<ulong/*clientID*/, List<HeroHolder>> dicHolder = new();
 
@@ -117,6 +119,15 @@ public class Spawner : NetworkBehaviour
         ServerHeroSpawnHolderServerRpc(LocalID());
     }
 
+    // 중간에 비어 있는 가장 작은 idx 를 찾습니다.
+    int FindFirstMissingIndex<T>(IEnumerable<T> items, Func<T, int> selector)
+    {
+        var set = new HashSet<int>(items.Select(selector)); // idx만 추출
+        int i = 0;
+        while (set.Contains(i)) i++;
+        return i;
+    }
+
     private void HeroSpawn(ulong clientid)
     {
         if (!IsServer)
@@ -151,7 +162,11 @@ public class Spawner : NetworkBehaviour
         netObjHolder.Spawn();
 
         var holder = h.GetComponent<HeroHolder>();
-        holder.GetComponent<HeroHolder>().idx = dicHolder[clientid].Count;
+
+        var list = dicHolder[clientid];
+        int idx = FindFirstMissingIndex(list, x => x.idx);
+
+        holder.GetComponent<HeroHolder>().idx = idx;
         dicHolder[clientid].Add(holder.GetComponent<HeroHolder>());
 
         ClientHeroHolderSpawnClientRpc(netObjHolder.NetworkObjectId, clientid, data.GetData());
@@ -196,7 +211,9 @@ public class Spawner : NetworkBehaviour
                 }
 
                 var holder = heroNetObj.GetComponent<HeroHolder>();
-                holder.GetComponent<HeroHolder>().idx = dicHolder[clientid].Count;
+                var list = dicHolder[clientid];
+                int idx = FindFirstMissingIndex(list, x => x.idx);
+                holder.GetComponent<HeroHolder>().idx = idx;
                 dicHolder[clientid].Add(holder.GetComponent<HeroHolder>());
             }
 
@@ -222,7 +239,7 @@ public class Spawner : NetworkBehaviour
 
         netObj.transform.position = spawnList[positionValue];
 
-        netObj.GetComponent<HeroHolder>().pos = spawnList[positionValue];
+        netObj.GetComponent<HeroHolder>().idx = positionValue;
     }
 
     public void SwapHoldersChanges(ulong clientId, int h1, int h2)
@@ -244,8 +261,9 @@ public class Spawner : NetworkBehaviour
 
     private void GetPositionSet(ulong clientId, int h1, int h2)
     {
-        var holder1 = dicHolder[clientId][h1];
-        var holder2 = dicHolder[clientId][h2];
+        
+        var holder1 = dicHolder[clientId].Find((h) => h.idx == h1);
+        var holder2 = dicHolder[clientId].Find((h) => h.idx == h2);
 
         holder1.HeroChange(holder2);
         holder2.HeroChange(holder1);

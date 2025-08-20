@@ -31,25 +31,59 @@ public class HeroHolder : NetworkBehaviour
 
         square.transform.localScale = collider.size;
 
-        btnSell.onClick.AddListener(() => CS_Sell_ServerRpc());
+        btnSell.onClick.AddListener(() => CS_Sell_ServerRpc(NetworkManager.Singleton.LocalClientId));
         // btnCompose.onClick.AddListener(() => CS_Sell_ServerRpc());
 
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void CS_Sell_ServerRpc()
+    public void CS_Sell_ServerRpc(ulong clientid)
     {
         var target = Heros.Last();
         var netGo = NetworkManager.Singleton.SpawnManager.SpawnedObjects[target.NetworkObjectId];
-        BC_Sell_ClientRpc(netGo.NetworkObjectId);
+        BC_Sell_ClientRpc(netGo.NetworkObjectId, clientid);
         netGo.Despawn(); // 이것도 위험해 보이는데...
     }
 
     [ClientRpc]
-    public void BC_Sell_ClientRpc(ulong netObjId)
+    public void BC_Sell_ClientRpc(ulong netObjId, ulong clientid)
     {
+        Debug.Log("test: " + NetworkManager.Singleton.LocalClientId);
+
         var netGo = NetworkManager.Singleton.SpawnManager.SpawnedObjects[netObjId]; // 이것도 위험해 보이는데...
         Heros.Remove(netGo.GetComponent<Hero>());
+        if(Heros.Count == 0)
+        {
+            if(IsHost) // 같은 요청을 모든 클라가 할 필요가 없어서 임시로.
+                C2S_Destroy_ServerRpc(clientid);
+        } else
+        {
+            CheckGetPosition();
+        }
+    }
+
+
+    [ServerRpc(RequireOwnership = false)]
+    public void C2S_Destroy_ServerRpc(ulong clientId)
+    {
+        BC_Destroy_ClientRpc(clientId);
+        var netObjHolder = NetworkManager.Singleton.SpawnManager.SpawnedObjects[NetworkObjectId];
+        netObjHolder.Despawn();
+    }
+
+    [ClientRpc]
+    public void BC_Destroy_ClientRpc(ulong clientId)
+    {
+        Spawner.instance.dicHolder[clientId].Remove(this);
+        bool isMe = clientId == NetworkManager.Singleton.LocalClientId;
+        if (isMe)
+        {
+            Spawner.mySpawnedList[idx] = false;
+        }
+        else
+        {
+            Spawner.otherSpawnedList[idx] = false;
+        }
     }
 
     public void Composition()
@@ -161,35 +195,6 @@ public class HeroHolder : NetworkBehaviour
         {
             heroData = data;
 
-            
-
-            var parent = heroNetObj.transform.parent;
-            int siblingCount = parent.childCount;
-
-            // 기본으로 자식 개수는 3
-            if (siblingCount == 4)
-            {
-                parent.GetChild(3).transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
-                parent.GetChild(3).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 3;
-            } else if(siblingCount == 5)
-            {
-                parent.GetChild(3).transform.localPosition = new Vector3(-0.1f, 0.0f, 0.0f);
-                parent.GetChild(3).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 3;
-                parent.GetChild(4).transform.localPosition = new Vector3(0.1f, 0.0f, 0.0f);
-                parent.GetChild(4).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 4;
-            } else if(siblingCount == 6)
-            {
-                parent.GetChild(3).transform.localPosition = new Vector3(-0.1f, 0.05f, 0.0f);
-                parent.GetChild(3).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 3;
-                parent.GetChild(4).transform.localPosition = new Vector3(0.1f, 0.05f, 0.0f);
-                parent.GetChild(4).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 4;
-                parent.GetChild(5).transform.localPosition = new Vector3(0.0f, -0.05f, 0.0f);
-                parent.GetChild(5).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 5;
-            } else
-            {
-                // error
-            }
-
             var hero = heroNetObj.GetComponent<Hero>();
             hero.Initdata(data, this);
 
@@ -198,6 +203,39 @@ public class HeroHolder : NetworkBehaviour
             {
                 Heros.Add(hero);
             }
+
+            CheckGetPosition();
+        }
+    }
+
+    private void CheckGetPosition()
+    {
+        int siblingCount = Heros.Count;
+        
+        if (siblingCount == 1)
+        {
+            transform.GetChild(3).transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
+            transform.GetChild(3).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 3;
+        }
+        else if (siblingCount == 2)
+        {
+            transform.GetChild(3).transform.localPosition = new Vector3(-0.1f, 0.0f, 0.0f);
+            transform.GetChild(3).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 3;
+            transform.GetChild(4).transform.localPosition = new Vector3(0.1f, 0.0f, 0.0f);
+            transform.GetChild(4).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 4;
+        }
+        else if (siblingCount == 3)
+        {
+            transform.GetChild(3).transform.localPosition = new Vector3(-0.1f, 0.05f, 0.0f);
+            transform.GetChild(3).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 3;
+            transform.GetChild(4).transform.localPosition = new Vector3(0.1f, 0.05f, 0.0f);
+            transform.GetChild(4).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 4;
+            transform.GetChild(5).transform.localPosition = new Vector3(0.0f, -0.05f, 0.0f);
+            transform.GetChild(5).GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = 5;
+        }
+        else
+        {
+            // error
         }
     }
 
