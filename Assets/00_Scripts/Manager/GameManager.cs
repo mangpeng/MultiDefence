@@ -33,18 +33,32 @@ public partial class GameManager : NetworkBehaviour
 
     private void Start()
     {
-        StartClient();
-        StartServer();
+        if (IsServer)
+        {
+            StartClient();
+        }
+
+        if (IsClient)
+        {
+            StartServer();
+        }
     }
     private void Update()
-    {
-        UpdateServer();
-        UpdateClient();
+    {        
+        if (IsServer)
+        {
+            UpdateServer();
+        } 
+        
+        if(IsClient) 
+        {
+            UpdateClient();
+        }
     }
 
     private void StartClient()
     {
-        if (!IsClient) return;
+
     }
 
 

@@ -2049,7 +2049,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 3 / 10
+  m_text: 30 / 100
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2496,6 +2496,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   txtMonsterCount: {fileID: 639886206}
+  imgMonsterCount: {fileID: 1752530092}
   txtSummon: {fileID: 1242064624}
   txtMoney: {fileID: 704091781}
   txtWave: {fileID: 2017750556}
@@ -4106,6 +4107,10 @@ PrefabInstance:
       propertyPath: GlobalObjectIdHash
       value: 1074757402
       objectReference: {fileID: 0}
+    - target: {fileID: 8015913039571994389, guid: c9bad1789bcd8e84fa2d15c4c8e5c51f, type: 3}
+      propertyPath: MONSTER_SPAWN_INTERVAL
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4546,7 +4551,7 @@ MonoBehaviour:
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 0
-  m_FillAmount: 1
+  m_FillAmount: 0.3
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0

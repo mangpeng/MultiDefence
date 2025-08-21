@@ -23,7 +23,6 @@ public partial class GameManager
     {
         while (remainTime > 0)
         {
-            Debug.Log($"server: {remainTime} {curWave}");
             BC_UpdateTime_ClientRpc(remainTime, curWave);
             yield return new WaitForSeconds(1); // timeScale 영향 받음
             remainTime--;
