@@ -420,13 +420,13 @@ MonoBehaviour:
       - m_Target: {fileID: 1557298048}
         m_TargetAssemblyTypeName: Spawner, Assembly-CSharp
         m_MethodName: Summon
-        m_Mode: 1
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Common
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!1 &430092345
@@ -1622,10 +1622,6 @@ PrefabInstance:
     - target: {fileID: 6905598574187716089, guid: c9bad1789bcd8e84fa2d15c4c8e5c51f, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 1074757402
-      objectReference: {fileID: 0}
-    - target: {fileID: 8015913039571994389, guid: c9bad1789bcd8e84fa2d15c4c8e5c51f, type: 3}
-      propertyPath: MONSTER_SPAWN_INTERVAL
-      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

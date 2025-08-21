@@ -7,7 +7,7 @@ using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class Spawner : NetworkBehaviour
+public partial class Spawner : NetworkBehaviour
 {
     public static Spawner instance = null;
     private void Awake()
@@ -39,13 +39,14 @@ public class Spawner : NetworkBehaviour
     public Dictionary<ulong/*clientID*/, List<HeroHolder>> dicHolder = new();
 
     public static float xValue, yValue;
-
+    
     void Start()
     {
         SetGrid();
         StartCoroutine(CSpawnMonster());
     }
 
+    #region Grid
     private void SetGrid()
     {
         GridStart(transform.GetChild(0), isPlayer: true);
@@ -62,7 +63,6 @@ public class Spawner : NetworkBehaviour
         }
     }
 
-    #region Make Grid
     private void GridStart(Transform tr, bool isPlayer)
     {
         var parentSprite = tr.GetComponent<SpriteRenderer>();
@@ -97,110 +97,84 @@ public class Spawner : NetworkBehaviour
     }
     #endregion
 
-    #region SummonCharacter
-    public void Summon()
+    #region Summon
+    public void Summon(string rarity)
     {
-        //if (GameManager.instance.Money < GameManager.instance.SummonCount)
-        //    return;
-
-        //GameManager.instance.Money -= GameManager.instance.SummonCount;
-        //GameManager.instance.SummonCount += 2;
-
-
-        //if (IsClient)
-        //{
-        //    ServerHeroSpawnServerRpc(LocalID());
-        //}
-        //else
-        //{
-        //    HeroSpawn(LocalID());
-        //}
-        
-        ServerHeroSpawnHolderServerRpc(LocalID());
+        Summon("", rarity);
     }
 
-    // 중간에 비어 있는 가장 작은 idx 를 찾습니다.
-    int FindFirstMissingIndex<T>(IEnumerable<T> items, Func<T, int> selector)
-    {
-        var set = new HashSet<int>(items.Select(selector)); // idx만 추출
-        int i = 0;
-        while (set.Contains(i)) i++;
-        return i;
+    public void Summon(string holderName, string rarity)
+    {                
+        C2S_SpawnHeroHolder_ServerRpc(UtilManager.LocalID, holderName, rarity);
     }
 
-    private void HeroSpawn(ulong clientid)
+    private void SetPositionHero(NetworkObject netObj, List<Vector2> spawnList, List<bool> spawnedList)
     {
-        if (!IsServer)
-            return;
-
-
-        HeroStat[] datas = Resources.LoadAll<HeroStat>("HeroData");
-        var data = datas[UnityEngine.Random.Range(0, datas.Length)];
-        
-
-        if(!dicHolder.TryGetValue(clientid, out var heroHolders))
+        int positionValue = spawnedList.IndexOf(false);
+        if (positionValue == -1)
         {
-            dicHolder.Add(clientid, new());
+            Debug.LogError("There is no place to spawn heroholder");
+            return;
         }
 
-        bool isHolderAdded = false;
-        dicHolder[clientid].ForEach((holder) =>
-        {
-            if(holder.HolderName == data.Name && holder.Heros.Count < 3)
-            {
-                holder.SpawnHeroHolder(data.GetData(), clientid);
-                isHolderAdded = true;
-                return;
-            }
-        });
-
-        if (isHolderAdded)
-            return;
-
-        var h = Instantiate(spawnHolder);
-        NetworkObject netObjHolder = h.GetComponent<NetworkObject>();
-        netObjHolder.Spawn();
-
-        var holder = h.GetComponent<HeroHolder>();
-
-        var list = dicHolder[clientid];
-        int idx = FindFirstMissingIndex(list, x => x.idx);
-
-        holder.GetComponent<HeroHolder>().idx = idx;
-        dicHolder[clientid].Add(holder.GetComponent<HeroHolder>());
-
-        ClientHeroHolderSpawnClientRpc(netObjHolder.NetworkObjectId, clientid, data.GetData());
-
-        //foreach(var dd in dicHolder)
-        //{
-        //    if(dd.Value.Heros.Count < 3 && dd.Value.HolderName == data.Name)
-        //    {
-        //        dd.Value.SpawnHeroHolder(data.GetData());
-        //        return;
-        //    }
-        //}
-
-        //var h = Instantiate(spawnHolder);
-        //// dicHolder.Add(dicHolder.Count.ToString(), h.GetComponent<HeroHolder>());
-        //NetworkObject netObjHolder = h.GetComponent<NetworkObject>();
-        //netObjHolder.Spawn();
-
-        //ClientHeroHolderSpawnClientRpc(netObjHolder.NetworkObjectId, clientid, data.GetData());
+        spawnedList[positionValue] = true;
+        netObj.transform.position = spawnList[positionValue];
+        netObj.GetComponent<HeroHolder>().idx = positionValue;
     }
 
-    [ServerRpc(RequireOwnership = false)]
-    private void ServerHeroSpawnHolderServerRpc(ulong clientid)
+    public void SwapHoldersChanges(ulong clientId, int h1, int h2)
     {
-        HeroSpawn(clientid);
+        C2S_GetPosition_ServerRpc(clientId, h1, h2);
+    }
+
+    private void GetPositionSet(ulong clientId, int h1, int h2)
+    {
+        
+        var holder1 = dicHolder[clientId].Find((h) => h.idx == h1);
+        var holder2 = dicHolder[clientId].Find((h) => h.idx == h2);
+
+        holder1.HeroChange(holder2);
+        holder2.HeroChange(holder1);
+
+        (holder1.Heros, holder2.Heros) = (holder2.Heros, holder1.Heros);
+        (holder1.HolderName, holder2.HolderName) = (holder2.HolderName, holder1.HolderName);
+    }
+
+    #endregion
+
+    #region RPC
+    [ClientRpc]
+    private void BC_GetPosition_ClientRpc(ulong clientId, int h1, int h2)
+    {
+        Debug.Log($"[S->C]{nameof(BC_GetPosition_ClientRpc)}");
+
+        GetPositionSet(clientId, h1, h2);
     }
 
     [ClientRpc]
-    private void ClientHeroHolderSpawnClientRpc(ulong netObjId, ulong clientid, HeroStatData data)
+    private void BC_MonsterSpawnClientRpc(ulong netObjId, ulong clientid)
     {
+        // Debug.Log($"[S->C]{nameof(BC_MonsterSpawnClientRpc)}");
+
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(netObjId, out NetworkObject monsterNetObj)) 
+        {
+            var moveList = clientid == NetworkManager.Singleton.LocalClientId ? myMonsterMoveList : otherMonsterMoveList;
+            monsterNetObj.transform.position = moveList[0];
+            monsterNetObj.GetComponent<Monster>().Init(moveList);
+        }
+    }
+
+    [ClientRpc]
+    private void BC_SpawnHeroHolder_ClientRpc(ulong netObjId, ulong clientid, HeroStatData data, string rarity)
+    {
+        Debug.Log($"[S->C]{nameof(BC_SpawnHeroHolder_ClientRpc)}");
+
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(netObjId, out NetworkObject heroNetObj))
         {
-            bool isPlayer = NetworkManager.Singleton.LocalClientId == clientid;            
-            SetPositionHero(heroNetObj, isPlayer);
+            bool isPlayer = NetworkManager.Singleton.LocalClientId == clientid;
+            SetPositionHero(heroNetObj,
+                isPlayer ? mySpawnList : otherSpawnList,
+                isPlayer ? mySpawnedList : otherSpawnedList);
 
             // sync holders between server and client
             if (!IsHost)
@@ -217,126 +191,26 @@ public class Spawner : NetworkBehaviour
                 dicHolder[clientid].Add(holder.GetComponent<HeroHolder>());
             }
 
-            heroNetObj.GetComponent<HeroHolder>().SpawnHeroHolder(data, clientid);
+            heroNetObj.GetComponent<HeroHolder>().SpawnHeroHolder(data, clientid, rarity);
         }
-    }
-
-    private void SetPositionHero(NetworkObject netObj, bool Player)
-    {
-        List<bool> spawnedList = Player ? mySpawnedList : otherSpawnedList;
-        List<Vector2> spawnList = Player ? mySpawnList : otherSpawnList;
-
-        int positionValue = -1;
-        for (int i = 0; i < spawnedList.Count; i++)
-        {
-            if (spawnedList[i] == false)
-            {
-                positionValue = i;
-                spawnedList[i] = true;
-                break;
-            }
-        }
-
-        netObj.transform.position = spawnList[positionValue];
-
-        netObj.GetComponent<HeroHolder>().idx = positionValue;
-    }
-
-    public void SwapHoldersChanges(ulong clientId, int h1, int h2)
-    {
-        C2S_GetPosition_ServerRpc(clientId, h1, h2);
-    }
-
-    [ServerRpc(RequireOwnership = false)]
-    private void C2S_GetPosition_ServerRpc(ulong clientId, int h1, int h2)
-    {
-        BC_GetPosition_ClientRpc(clientId, h1, h2);        
-    }
-
-    [ClientRpc]
-    private void BC_GetPosition_ClientRpc(ulong clientId, int h1, int h2)
-    {
-        GetPositionSet(clientId, h1, h2);
-    }
-
-    private void GetPositionSet(ulong clientId, int h1, int h2)
-    {
-        
-        var holder1 = dicHolder[clientId].Find((h) => h.idx == h1);
-        var holder2 = dicHolder[clientId].Find((h) => h.idx == h2);
-
-        holder1.HeroChange(holder2);
-        holder2.HeroChange(holder1);
-
-        var tmp1 = holder1.Heros;
-        holder1.Heros = new List<Hero>(holder2.Heros);
-        holder2.Heros = new List<Hero>(tmp1);
-
-        var tmp2 = holder1.HolderName;
-        holder1.HolderName = holder2.HolderName;
-        holder2.HolderName = tmp2;
     }
 
     #endregion
 
-    #region SummonMonster
-    IEnumerator CSpawnMonster()
+    #region Utils
+
+    // 중간에 비어 있는 가장 작은 idx 를 찾습니다.
+    int FindFirstMissingIndex<T>(IEnumerable<T> items, Func<T, int> selector)
     {
-        // 서버에서 이미 몬스터 경로 정보 읽어서 스폰해서 클라한테 알리지만 클라는 몬스터 경로 정보 읽지 못해서 클라에서 에러나서 임시로 최초 스폰 딜레이 줌
-        yield return new WaitForSeconds(3.0f);
-
-        // yield return new WaitForSeconds(MONSTER_SPAWN_INTERVAL);
-
-        //if (IsClient)
-        //{
-        //    ServerMonsterSpawnServerRpc(NetworkManager.Singleton.LocalClientId);
-        //}
-        //else
-        //{
-        //    MonsterSpawn(NetworkManager.Singleton.LocalClientId);
-        //}
-
-        if (!IsServer) yield break;
-
-        while (true)
-        {
-            yield return new WaitForSeconds(MONSTER_SPAWN_INTERVAL);
-
-            for (int i = 0; i < NetworkManager.ConnectedClients.Count; i++)
-            {
-                var monster = Instantiate(prefMonster);
-                NetworkObject netObj = monster.GetComponent<NetworkObject>();
-                netObj.Spawn();
-
-                GameManager.instance.AddMonster(monster);
-                BC_MonsterSpawnClientRpc(netObj.NetworkObjectId, (ulong)i);
-            }
-        }
-        
-        // StartCoroutine(CSpawnMonster());
+        var set = new HashSet<int>(items.Select(selector)); // idx만 추출
+        int i = 0;
+        while (set.Contains(i)) i++;
+        return i;
     }
 
-    [ClientRpc]
-    private void BC_MonsterSpawnClientRpc(ulong netObjId, ulong clientid)
+    private HeroHolder FindEmptyHereHolderOrNull(ulong clientid, string hereName)
     {
-        if(NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(netObjId, out NetworkObject monsterNetObj))
-        {
-            if (clientid == NetworkManager.Singleton.LocalClientId)
-            {
-                monsterNetObj.transform.position = myMonsterMoveList[0];
-                monsterNetObj.GetComponent<Monster>().Init(myMonsterMoveList);
-            }
-            else
-            {
-                monsterNetObj.transform.position = otherMonsterMoveList[0];
-                monsterNetObj.GetComponent<Monster>().Init(otherMonsterMoveList);
-            }
-        }
-    }
-
-    private ulong LocalID()
-    {
-        return NetworkManager.Singleton.LocalClientId;
+        return dicHolder[clientid].FindAll((holder) => holder.HolderName == hereName && holder.Heros.Count < 3).FirstOrDefault();
     }
 
     #endregion

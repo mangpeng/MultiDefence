@@ -22,11 +22,6 @@ public partial class NetManager : MonoBehaviour
 
     public Button btnStartMatchmaking;
     public Button btnCancelMatching;
-
-    //public Button btnEnterLobby;
-    //public TMP_InputField inputJoinCode;
-    //public TextMeshProUGUI txtJoinCode;
-
     public GameObject matchingObj;
      
     private async void Start()
@@ -37,7 +32,6 @@ public partial class NetManager : MonoBehaviour
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
         }
 
-        // btnEnterLobby.onClick.AddListener(() => JoinGameWithCode(inputJoinCode.text));
         btnStartMatchmaking.onClick.AddListener(() => StartMatchmaking());
 
 

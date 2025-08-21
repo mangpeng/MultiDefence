@@ -20,13 +20,18 @@ public class Hero : Character
 
     bool isMove = false;
 
-    public void Initdata(HeroStatData data, HeroHolder holder)
+    public void Initdata(HeroStatData data, HeroHolder holder, string rarity)
     {
         attackRange = data.heroRange;
         ATK = data.heroAtk;
         attackSpeed = data.heroAtk_speed;
         parentHolder = holder;
-        GetInitCharacter(data.heroName);
+        GetInitCharacter(data.heroName, rarity);
+
+        if(rarity == "Uncommon")
+        {
+            sprRr.color = Color.red;
+        }
     }
 
     protected override void Awake()
@@ -119,23 +124,10 @@ public class Hero : Character
         }
     }
 
-    //private void Attack(Transform target)
-    //{
-    //    if(target == null) return;  
-
-    //    Debug.Log("Attack");
-    //    Debug.DrawLine(transform.position, target.position, Color.blue, 0.5f);
-    //    AnimChange("ATTACK", true);
-
-    //    var monster = target.GetComponent<Monster>();
-    //    monster.GetDamage(10);
-    //}
-
-    //private void OnDrawGizmosSelected()
-    //{
-    //    Gizmos.color = Color.red;
-    //    Gizmos.DrawWireSphere(parentHolder.transform.position, attackRange);
-    //}
+    public void Sell(ulong clientId)
+    {
+        parentHolder.C2S_SellHero_ServerRpc(clientId);
+    }
 
     #region Network
     [ServerRpc(RequireOwnership = false)]

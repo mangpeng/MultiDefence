@@ -12,9 +12,9 @@ public class Character : NetworkBehaviour
         sprRr = transform.GetChild(0).GetComponent<SpriteRenderer>();
     }
 
-    public void GetInitCharacter(string animator)
+    public void GetInitCharacter(string heroeName, string rarity)
     {
-        anim.runtimeAnimatorController = Resources.Load<HeroStat>("HeroData/" + animator).animatorController;
+        anim.runtimeAnimatorController = Resources.Load<HeroStat>($"HeroData/{rarity}/{heroeName}").animatorController;
     }
 
     protected void AnimChange(string temp, bool trigger)

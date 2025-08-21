@@ -15,7 +15,6 @@ public partial class NetManager: MonoBehaviour
     {
         if(NetworkManager.Singleton.IsHost)
         {
-            Debug.Log("I am " + NetworkManager.Singleton.LocalClientId);
             NetworkManager.Singleton.SceneManager.LoadScene(gamePlaySceneName, UnityEngine.SceneManagement.LoadSceneMode.Single);
         }
     }

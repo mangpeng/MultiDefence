@@ -25,6 +25,7 @@ public class HeroStat : ScriptableObject
     public float ATK_Speed;
     public float Range;
     public RuntimeAnimatorController animatorController;
+    public Rarity rarity;
 
     public HeroStatData GetData()
     {

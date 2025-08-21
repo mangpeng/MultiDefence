@@ -20,19 +20,6 @@ public partial class NetManager: MonoBehaviour
 
         try
         {
-            //var joinAlloc = await RelayService.Instance.JoinAllocationAsync(inputJoinCode.Trim());
-
-            //// 접속한 호스트 정보로 서버데이터 변경
-            //NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(
-            //    joinAlloc.RelayServer.IpV4,
-            //    (ushort)joinAlloc.RelayServer.Port,
-            //    joinAlloc.AllocationIdBytes,
-            //    joinAlloc.Key,
-            //    joinAlloc.ConnectionData,
-            //    joinAlloc.HostConnectionData
-            //    );
-
-
             Debug.Log("Enter lobby with gamecode");
 
             curLobby = await FindAvailableLobby();
@@ -47,95 +34,6 @@ public partial class NetManager: MonoBehaviour
             Debug.Log(inputJoinCode);
         }
     }
-
-
-    //public async Task JoinGameWithCode(string inputJoinCode)
-    //{
-    //    // 0) 입력 검증/정규화
-    //    var code = inputJoinCode?.Trim().ToUpperInvariant();
-    //    if (string.IsNullOrWhiteSpace(code) || !Regex.IsMatch(code, "^[A-Z0-9]{6,8}$"))
-    //    {
-    //        Debug.LogError($"[JOIN] Invalid join code: '{inputJoinCode}'");
-    //        return;
-    //    }
-
-    //    try
-    //    {
-    //        // 1) Unity Services 초기화 & 로그인
-    //        if (UnityServices.State == ServicesInitializationState.Uninitialized)
-    //            await UnityServices.InitializeAsync();
-
-    //        if (!AuthenticationService.Instance.IsSignedIn)
-    //            await AuthenticationService.Instance.SignInAnonymouslyAsync();
-
-    //        if (RelayService.Instance == null)
-    //        {
-    //            Debug.LogError("[JOIN] RelayService.Instance is null");
-    //            return;
-    //        }
-
-    //        // 2) Relay Join
-    //        var joinAlloc = await RelayService.Instance.JoinAllocationAsync(code);
-    //        if (joinAlloc == null)
-    //        {
-    //            Debug.LogError("[JOIN] joinAlloc is null");
-    //            return;
-    //        }
-
-    //        // 3) NetworkManager / Transport 확보
-    //        var nm = NetworkManager.Singleton;
-    //        if (nm == null)
-    //        {
-    //            Debug.LogError("[JOIN] NetworkManager.Singleton is null (씬에 배치됐는지 확인).");
-    //            return;
-    //        }
-
-    //        var transport = nm.GetComponent<UnityTransport>();
-    //        if (transport == null)
-    //        {
-    //            Debug.LogError("[JOIN] UnityTransport component is missing on NetworkManager.");
-    //            return;
-    //        }
-
-    //        // 4) RelayServerData 세팅 (버전에 따라 한 가지 선택)
-    //        // (A) 최신 방식: RelayServerData 객체 사용
-    //        transport.SetRelayServerData(
-    //            joinAlloc.RelayServer.IpV4,
-    //            (ushort)joinAlloc.RelayServer.Port,
-    //            joinAlloc.AllocationIdBytes,
-    //            joinAlloc.Key,
-    //            joinAlloc.ConnectionData,
-    //            joinAlloc.HostConnectionData
-    //        );
-
-    //        // 5) 즉시 바인드
-    //        var ok = nm.StartClient(); // ← StartClient()는 NetworkManager 통해 호출
-    //        if (!ok)
-    //        {
-    //            Debug.LogError("[JOIN] StartClient() returned false.");
-    //            return;
-    //        }
-
-    //        Debug.Log($"[JOIN] StartClient OK. AllocationId={joinAlloc.AllocationId}");
-    //    }
-    //    catch (RelayServiceException e)
-    //    {
-    //        Debug.LogError($"[JOIN] RelayServiceException: {e.Message}\n{e}");
-    //        // 필요 시 로비 조회 등 추가 진단
-    //        try
-    //        {
-    //            var queryRes = await LobbyService.Instance.QueryLobbiesAsync();
-    //            Debug.Log($"[JOIN] Lobby count: {queryRes.Results?.Count}");
-    //        }
-    //        catch { /* 로비 커넥트 안 돼 있으면 실패할 수 있음 */ }
-    //    }
-    //    catch (System.Exception e)
-    //    {
-    //        Debug.LogError($"[JOIN] {e.GetType().Name}: {e.Message}\n{e}");
-    //    }
-    //}
-
-
     public async void StartMatchmaking()
     {
         if (!AuthenticationService.Instance.IsSignedIn)
@@ -266,7 +164,6 @@ public partial class NetManager: MonoBehaviour
     private void OnClientConnected(ulong clientId)
     {
         OnPlayerJoined();
-        Debug.Log($"{clientId}");
     }
 
     private void OnClientDisconnected(ulong clientId)
