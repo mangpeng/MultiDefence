@@ -1,17 +1,23 @@
 using NUnit.Framework;
 using System.Collections.Generic;
 using Unity.Netcode;
+using UnityEditor.PackageManager;
 using UnityEngine;
 
 public delegate void OnMoneyEventHandler();
+public delegate void OnUpdateUIEventHandler();
 
-public class GameManager : NetworkBehaviour
+
+public partial class GameManager : NetworkBehaviour
 {
     public static GameManager instance;
 
+    public event OnUpdateUIEventHandler OnUpdateUIWave;
+    public event OnUpdateUIEventHandler OnUpdateUITime;
+
     private void Awake()
     {
-        if(instance == null)
+        if (instance == null)
         {
             instance = this;
         }
@@ -25,6 +31,28 @@ public class GameManager : NetworkBehaviour
 
     public event OnMoneyEventHandler OnMoney;
 
+    private void Start()
+    {
+        StartClient();
+        StartServer();
+    }
+    private void Update()
+    {
+        UpdateServer();
+        UpdateClient();
+    }
+
+    private void StartClient()
+    {
+        if (!IsClient) return;
+    }
+
+
+    private void UpdateClient()
+    {
+
+    }
+
     public void GetMoney(int value)
     {
         Money += value;
@@ -35,19 +63,35 @@ public class GameManager : NetworkBehaviour
     {
         Monsters.Add(m);
         MonsterCount++;
-        BC_ClientMonsterCount_ClientRpc(MonsterCount);
+        BC_ClientMonsterCount_ClientRpc(MonsterCount); //TODO 서버에게 요청 하고 처리 하도록 변경 필요
     }
 
     public void RemoveMonster(Monster m)
     {
         Monsters.Remove(m);
         MonsterCount--;
-        BC_ClientMonsterCount_ClientRpc(MonsterCount);
+        BC_ClientMonsterCount_ClientRpc(MonsterCount); //TODO 서버에게 요청 하고 처리 하도록 변경 필요
     }
 
+    #region RPC
     [ClientRpc]
     private void BC_ClientMonsterCount_ClientRpc(int count)
     {
+        Debug.Log($"[S->C]{nameof(BC_ClientMonsterCount_ClientRpc)}");
+
         MonsterCount = count;
     }
+
+    [ClientRpc]
+    private void BC_UpdateTime_ClientRpc(int remainTime, int curWave)
+    {
+        Debug.Log($"[S->C]{nameof(BC_UpdateTime_ClientRpc)}");
+
+        this.remainTime = remainTime;
+        this.curWave = curWave;
+
+        OnUpdateUIWave?.Invoke();
+        OnUpdateUITime?.Invoke();
+    }
+    #endregion
 }

@@ -6,6 +6,8 @@ public class UIMain : MonoBehaviour
     [SerializeField] private TextMeshProUGUI txtMonsterCount;
     [SerializeField] private TextMeshProUGUI txtSummon;
     [SerializeField] private TextMeshProUGUI txtMoney;
+    [SerializeField] private TextMeshProUGUI txtWave;
+    [SerializeField] private TextMeshProUGUI txtTime;
 
     [SerializeField] private Animator animAsset;
 
@@ -13,7 +15,10 @@ public class UIMain : MonoBehaviour
     {
         GameManager.instance.OnMoney += MoneyAni;
 
+        GameManager.instance.OnUpdateUIWave += UpdateUIWave;
+        GameManager.instance.OnUpdateUITime += UpdateUITime;
     }
+
     private void Update()
     {
         txtMonsterCount.text = $"{GameManager.instance.MonsterCount.ToString()} / 100";
@@ -21,6 +26,24 @@ public class UIMain : MonoBehaviour
         txtMoney.text = GameManager.instance.Money.ToString();    
         txtSummon.color = GameManager.instance.Money >= GameManager.instance.SummonCount ? Color.white : Color.gray;
     }
+
+    #region UI
+
+    private void UpdateUIWave()
+    {
+        txtWave.text = $"WAVE{GameManager.instance.curWave:D2}";  
+    }
+
+    private void UpdateUITime()
+    {
+        int minutes = GameManager.instance.remainTime / 60;
+        int seconds = GameManager.instance.remainTime % 60;
+        var test = $"{minutes:D2}:{seconds:D2}";
+        Debug.Log($"{GameManager.instance.remainTime} {minutes} {seconds} {test}");
+        txtTime.text = test;
+    }
+
+    #endregion
 
     private void MoneyAni()
     {
