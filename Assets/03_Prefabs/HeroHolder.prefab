@@ -207,7 +207,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 620002540745997267}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 56a821ec69f1ed34397fdc28cb0fe3a4, type: 3}
+  m_Script: {fileID: 11500000, guid: fa087c7529a063445a7688d6a7aecffb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
@@ -224,6 +224,7 @@ MonoBehaviour:
     heroAtk: 0
     heroAtk_speed: 0
     heroRange: 0
+    heroRarity: 0
   pos: {x: 0, y: 0}
   idx: 0
   btnSell: {fileID: 3310557415890705451}

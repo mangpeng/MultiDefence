@@ -21,7 +21,7 @@ public partial class Spawner
                 NetworkObject netObj = monster.GetComponent<NetworkObject>();
                 netObj.Spawn();
 
-                GameManager.instance.AddMonster(monster);
+                GameManager.Instance.AddMonster(monster);
                 BC_MonsterSpawnClientRpc(netObj.NetworkObjectId, (ulong)i);
             }
         }
@@ -50,7 +50,7 @@ public partial class Spawner
         var emptyHolder = FindEmptyHereHolderOrNull(clientid, data.Name);
         if (emptyHolder != null)
         {
-            emptyHolder.SpawnHeroHolder(data.GetData(), clientid, rarity);
+            emptyHolder.SpawnHero(data.GetData(), clientid, rarity);
             return;
         }
 

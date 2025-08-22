@@ -69,13 +69,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 4480561131397840941}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2ee789a5620b0864f8601fc174716aff, type: 3}
+  m_Script: {fileID: 11500000, guid: 4308c7a3975b943468c103b65ca02b80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   ATK: 0
   attackRange: 1
   m_Data: {fileID: 11400000, guid: ce73efdb5373f7943b52f7f3015a7ecd, type: 2}
+  parentHolder: {fileID: 0}
 --- !u!1 &7718687759368404814
 GameObject:
   m_ObjectHideFlags: 0

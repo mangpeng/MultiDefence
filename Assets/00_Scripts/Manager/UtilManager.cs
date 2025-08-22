@@ -26,4 +26,24 @@ public class UtilManager
     {
         return clientid == LocalID;
     }
+
+    public static Color GetColorByRarity(string r)
+    {
+        if (r == "Common") return GetColorByRarity(Rarity.Common);
+        else if(r == "Uncommon") return GetColorByRarity(Rarity.Uncommon);
+        else return GetColorByRarity(Rarity.Rare);
+    }
+
+    public static Color GetColorByRarity(Rarity r)
+    {
+        switch (r)
+        {
+            case Rarity.Common: return Color.gray;
+            case Rarity.Uncommon: return Color.white;
+            case Rarity.Rare: return Color.blue;
+            case Rarity.Hero: return Color.black;
+            case Rarity.Lengendary: return Color.black;
+            default: return Color.black;
+        }
+    }
 }

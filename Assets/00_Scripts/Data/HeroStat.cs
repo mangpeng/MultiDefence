@@ -8,6 +8,7 @@ public struct HeroStatData : INetworkSerializable
     public int heroAtk;
     public float heroAtk_speed;
     public float heroRange;
+    public Rarity heroRarity;
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
@@ -35,6 +36,7 @@ public class HeroStat : ScriptableObject
             heroAtk = ATK,
             heroAtk_speed = ATK_Speed,
             heroRange = Range,
+            heroRarity = rarity
         };
     }
 }

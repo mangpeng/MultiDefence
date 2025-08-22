@@ -100,12 +100,23 @@ public partial class Spawner : NetworkBehaviour
     #region Summon
     public void Summon(string rarity)
     {
+        if (GameManager.Instance.Money < GameManager.Instance.SummonNeedMoney)
+            return;
+
+        if (GameManager.Instance.HeroCount >= GameManager.MAX_HERO_COUNT)
+            return;
+
+        GameManager.Instance.Money -= GameManager.Instance.SummonNeedMoney;
+        GameManager.Instance.SummonNeedMoney += 2;
+        ++GameManager.Instance.HeroCount;
+
         Summon("", rarity);
     }
 
     public void Summon(string holderName, string rarity)
     {                
         C2S_SpawnHeroHolder_ServerRpc(UtilManager.LocalID, holderName, rarity);
+
     }
 
     private void SetPositionHero(NetworkObject netObj, List<Vector2> spawnList, List<bool> spawnedList)
@@ -191,7 +202,8 @@ public partial class Spawner : NetworkBehaviour
                 dicHolder[clientid].Add(holder.GetComponent<HeroHolder>());
             }
 
-            heroNetObj.GetComponent<HeroHolder>().SpawnHeroHolder(data, clientid, rarity);
+            heroNetObj.GetComponent<HeroHolder>().SpawnHero(data, clientid, rarity);
+            ++GameManager.Instance.HeroCount;
         }
     }
 

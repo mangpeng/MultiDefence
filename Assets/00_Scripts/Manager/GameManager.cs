@@ -10,21 +10,15 @@ public delegate void OnUpdateUIEventHandler();
 
 public partial class GameManager : NetworkBehaviour
 {
-    public static GameManager instance;
+    public static GameManager Instance => Singleton<GameManager>.Instance;
 
     public event OnUpdateUIEventHandler OnUpdateUIWave;
     public event OnUpdateUIEventHandler OnUpdateUITime;
 
-    private void Awake()
-    {
-        if (instance == null)
-        {
-            instance = this;
-        }
-    }
-
     public int Money = 50;
-    public int SummonCount = 20;
+    public int SummonNeedMoney = 20;
+    public int HeroCount = 0;
+    public const int MAX_HERO_COUNT = 25;
 
     public List<Monster> Monsters = new();
     public int MonsterCount;

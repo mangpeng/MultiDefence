@@ -58,7 +58,7 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    path: txtCoin
+    path: asset01/imgCoin
   - curve:
       serializedVersion: 2
       m_Curve:
@@ -101,7 +101,7 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    path: imgCoin
+    path: asset01/txtCoin
   m_FloatCurves: []
   m_PPtrCurves: []
   m_SampleRate: 60
@@ -112,7 +112,7 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 3128362394
+      path: 1737121426
       attribute: 3
       script: {fileID: 0}
       typeID: 4
@@ -121,7 +121,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 3357902574
+      path: 366534118
       attribute: 3
       script: {fileID: 0}
       typeID: 4
@@ -195,7 +195,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalScale.x
-    path: txtCoin
+    path: asset01/imgCoin
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -243,7 +243,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalScale.y
-    path: txtCoin
+    path: asset01/imgCoin
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -291,7 +291,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalScale.z
-    path: txtCoin
+    path: asset01/imgCoin
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -339,7 +339,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalScale.x
-    path: imgCoin
+    path: asset01/txtCoin
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -387,7 +387,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalScale.y
-    path: imgCoin
+    path: asset01/txtCoin
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -435,7 +435,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalScale.z
-    path: imgCoin
+    path: asset01/txtCoin
     classID: 224
     script: {fileID: 0}
     flags: 0

@@ -32,7 +32,7 @@ public partial class NetManager : MonoBehaviour
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
         }
 
-        btnStartMatchmaking.onClick.AddListener(() => StartMatchmaking());
+        btnStartMatchmaking.onClick.AddListener(StartMatchmaking);
 
 
     }   
