@@ -6,31 +6,29 @@ using static UnityEngine.GraphicsBuffer;
 
 public partial class HeroHolder
 {
-    private void SpawnHero(ulong clientId, HeroStatData data, string rarity)
+    public void SpawnHero(ulong clientId, HeroStatData data, string rarity)
     {
         if (!IsServer)
             return;
 
+        if(Heros.Count >= 3)
+        {
+            Debug.LogError("Not enough space to spawn new here");
+            return;
+        }
+
         var go = Instantiate(_spawnHero);
         Heros.Add(go);
 
-
         NetworkObject netObj = go.GetComponent<NetworkObject>();
         netObj.Spawn();
-        netObj.transform.parent = this.transform;
-
-        var rpcParams = new ClientRpcParams
+        if(!netObj.TrySetParent(this.transform, worldPositionStays: false))
         {
-            Send = new ClientRpcSendParams { TargetClientIds = new[] { clientId } }
-        };
-        BC_ClientHeroSpawn_ClientRpc(netObj.NetworkObjectId, clientId, data, rarity, rpcParams);
+            Debug.LogError("Failed to set hero's transform parent");
+            return;
+        }
 
-        clientId = 1;
-        var rpcParams2 = new ClientRpcParams
-        {
-            Send = new ClientRpcSendParams { TargetClientIds = new[] { clientId } }
-        };
-        BC_ClientHeroSpawn_ClientRpc(netObj.NetworkObjectId, clientId, data, rarity, rpcParams2);
+        BC_ClientHeroSpawn_ClientRpc(netObj.NetworkObjectId, clientId, data, rarity);
     }
 
     #region RPC
@@ -53,19 +51,5 @@ public partial class HeroHolder
         netGo.Despawn(); // 이것도 위험해 보이는데...
     }
 
-    [ServerRpc(RequireOwnership = false)]
-    public void C2S_DestroyHeroHolder_ServerRpc(ulong clientId)
-    {
-        Debug.Log($"[C->S]{nameof(C2S_DestroyHeroHolder_ServerRpc)}");
-        
-        if(UtilManager.TryGetNetworkSpawnedObject(NetworkObjectId, out NetworkObject netObjHolder))
-        {
-            BC_DestroyHeroHolder_ClientRpc(clientId);
-            netObjHolder.Despawn();
-            return;
-        }
-
-        Debug.LogError("Failed to destroy hereHolder");
-    }
     #endregion
 }

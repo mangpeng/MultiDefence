@@ -85,7 +85,7 @@ public partial class GameManager : NetworkBehaviour
     [ClientRpc]
     private void BC_ClientMonsterCount_ClientRpc(int count)
     {
-        Debug.Log($"[S->C]{nameof(BC_ClientMonsterCount_ClientRpc)}");
+        // Debug.Log($"[S->C]{nameof(BC_ClientMonsterCount_ClientRpc)}");
 
         MonsterCount = count;
     }
@@ -93,7 +93,7 @@ public partial class GameManager : NetworkBehaviour
     [ClientRpc]
     private void BC_UpdateTime_ClientRpc(int remainTime, int curWave)
     {
-        Debug.Log($"[S->C]{nameof(BC_UpdateTime_ClientRpc)}");
+        // Debug.Log($"[S->C]{nameof(BC_UpdateTime_ClientRpc)}");
 
         this.remainTime = remainTime;
         this.curWave = curWave;

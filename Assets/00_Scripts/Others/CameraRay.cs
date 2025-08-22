@@ -51,6 +51,7 @@ public class CameraRay : NetworkBehaviour
         if (holder == null)
             return;
 
+        
         holder?.ShowCircle(true);
 
         var ray = Camera.main.ScreenPointToRay(Input.mousePosition);

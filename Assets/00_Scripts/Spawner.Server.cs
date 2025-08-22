@@ -1,5 +1,7 @@
 using System.Collections;
+using Unity.Android.Gradle.Manifest;
 using Unity.Netcode;
+using UnityEditor.PackageManager;
 using UnityEngine;
 
 public partial class Spawner
@@ -42,36 +44,28 @@ public partial class Spawner
             data = Resources.Load<HeroStat>(newPath);
         }
 
-        if (!dicHolder.TryGetValue(clientid, out var heroHolders))
-        {
-            dicHolder.Add(clientid, new());
-        }
-
         var emptyHolder = FindEmptyHereHolderOrNull(clientid, data.Name);
-        if (emptyHolder != null)
+        if(emptyHolder == null)
         {
-            emptyHolder.SpawnHero(data.GetData(), clientid, rarity);
-            return;
+            Debug.LogWarning("There are not enought heroholder");
         }
 
+        emptyHolder.SpawnHero(clientid, data.GetData(), rarity);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void C2S_SpawnHeroHolder_ServerRpc(ulong clientId)
+    {
         var h = Instantiate(spawnHolder);
         NetworkObject netObjHolder = h.GetComponent<NetworkObject>();
         netObjHolder.Spawn();
-
-        var holder = h.GetComponent<HeroHolder>();
-
-        var list = dicHolder[clientid];
-        int idx = FindFirstMissingIndex(list, x => x.idx);
-
-        holder.GetComponent<HeroHolder>().idx = idx;
-        dicHolder[clientid].Add(holder.GetComponent<HeroHolder>());
-
-        BC_SpawnHeroHolder_ClientRpc(netObjHolder.NetworkObjectId, clientid, data.GetData(), rarity);
+        
+        BC_SpawnHeroHolder_ClientRpc(netObjHolder.NetworkObjectId, clientId);
     }
 
     #region RPC
     [ServerRpc(RequireOwnership = false)]
-    private void C2S_SpawnHeroHolder_ServerRpc(ulong clientid, string holderName, string rarity)
+    private void C2S_SpawnHero_ServerRpc(ulong clientid, string holderName, string rarity)
     {
         Debug.Log($"[C->S]{nameof(C2S_SpawnHeroHolder_ServerRpc)}");
         HeroSpawn(clientid, holderName, rarity);

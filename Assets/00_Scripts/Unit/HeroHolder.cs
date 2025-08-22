@@ -6,6 +6,7 @@ using Unity.Android.Gradle.Manifest;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UIElements;
+using WebSocketSharp;
 using static UnityEditor.ShaderData;
 using static UnityEngine.GraphicsBuffer;
 
@@ -75,6 +76,7 @@ public partial class HeroHolder : NetworkBehaviour
             return;
         }
 
+        var tmpHolderName = HolderName; // 영웅이 판매 되면서 holder name이 초기화 되기 때문
         for(int i = 0; i < NEED_HERO_COUNT; i++)
         {
             heros[i].Sell(UtilManager.LocalID, new ActionContext
@@ -85,14 +87,28 @@ public partial class HeroHolder : NetworkBehaviour
 
         // FIXME
         GameManager.Instance.HeroCount -= 2;
-        Spawner.instance.Summon(HolderName, "Uncommon");
+        Spawner.instance.Summon(tmpHolderName, "Uncommon");
     }
     #endregion
     #region UI
-    public void ShowSquare(bool isShow) => square.gameObject.SetActive(isShow);
-    public void ShowCircle(bool isShow) => circle.gameObject.SetActive(isShow);
+    public void ShowSquare(bool isShow)
+    {
+        square.gameObject.SetActive(isShow);
+    }
+    public void ShowCircle(bool isShow)
+    {
+        if (isShow)
+        {
+            if (Heros.Count == 0) return;
+            circle.gameObject.SetActive(true);
+        } else
+        {
+            circle.gameObject.SetActive(false);
+        }
+    }
     public void ShowRange()
     {
+        if (Heros.Count == 0) return;
         circleRange.localScale = new Vector3(heroData.heroRange * 2, heroData.heroRange * 2, 1);
         circleRange.gameObject.SetActive(true);
         objCanvas.SetActive(true);
@@ -124,8 +140,8 @@ public partial class HeroHolder : NetworkBehaviour
 
         if (Heros.Count == 0)
         {
-            if (IsHost) // 같은 요청을 모든 클라가 할 필요가 없어서 임시로.
-                C2S_DestroyHeroHolder_ServerRpc(clientid);
+            HolderName = string.Empty;
+            HideRange();
         }
         else
         {
@@ -145,24 +161,19 @@ public partial class HeroHolder : NetworkBehaviour
     }
     
     [ClientRpc]
-    private void BC_ClientHeroSpawn_ClientRpc(ulong netObjId, ulong clientid, HeroStatData data, string rarity, ClientRpcParams rpcParams = default)
+    private void BC_ClientHeroSpawn_ClientRpc(ulong netObjId, ulong clientId, HeroStatData data, string rarity, ClientRpcParams rpcParams = default)
     {
         Debug.Log($"[S->C]{nameof(BC_ClientHeroSpawn_ClientRpc)}");
 
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(netObjId, out NetworkObject heroNetObj))
         {
-            heroData = data;
+            this.heroData = data;
+            this.HolderName = data.heroName;
 
             var hero = heroNetObj.GetComponent<Hero>();
             hero.Initdata(data, this, rarity);
 
-            // TODO
-            // This spawn request is currently sent by the host client.
-            // Therefore, 'clientId' here only represents the host’s client ID.
-            // It should be revised so that the server processes it correctly.
-            Debug.Log($"{OwnerClientId} {UtilManager.LocalID} {clientid}");
-            bool isMe = this.clientId == UtilManager.LocalID;
-            // 0 1 0
+            bool isMe = clientId == UtilManager.LocalID;
             if (isMe)
             {
                 Color rarityColor = UtilManager.GetColorByRarity(rarity);
@@ -172,7 +183,6 @@ public partial class HeroHolder : NetworkBehaviour
                 );
             }
 
-            // sync holders between server and client
             if (!IsHost)
             {
                 Heros.Add(hero);
@@ -221,22 +231,6 @@ public partial class HeroHolder : NetworkBehaviour
         for (int i = 0; i < Heros.Count; i++)
         {
             Heros[i].ChangePosition(holder, poss, i);
-        }
-    }
-
-    public void SpawnHero(HeroStatData data, ulong clientid, string rarity)
-    {
-        if (Heros.Count == 0)
-        {
-            HolderName = data.heroName;
-            this.clientId = clientid;
-        }
-
-        // 클라들이 중복된 요청 서버에게 보내는 것을 처리하기 위해 임시처리.
-        // 서버에서 holder 생성 -> hero 생성을 한번에 처리 하도록 수정 필요.
-        if (IsHost)
-        {
-            C2S_SpawnHero_ServerRpc(NetworkManager.Singleton.LocalClientId, data, rarity);
         }
     }
 

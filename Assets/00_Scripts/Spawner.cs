@@ -5,7 +5,9 @@ using System.Linq;
 using System.Threading;
 using Unity.Netcode;
 using Unity.VisualScripting;
+using UnityEditor.PackageManager;
 using UnityEngine;
+using WebSocketSharp;
 
 public partial class Spawner : NetworkBehaviour
 {
@@ -39,25 +41,40 @@ public partial class Spawner : NetworkBehaviour
     public Dictionary<ulong/*clientID*/, List<HeroHolder>> dicHolder = new();
 
     public static float xValue, yValue;
+
+    public int cnt = 0;
     
     void Start()
     {
+        Debug.Log("STart");
         SetGrid();
-        StartCoroutine(CSpawnMonster());
+        StartCoroutine(CDealy(() =>
+        {
+            Debug.Log("Delay");
+            // SetGrid();
+            StartCoroutine(CSpawnMonster());
+            GenerateSpawnHolder();
+        }, 5f));
     }
 
     #region Grid
+    IEnumerator CDealy(Action action, float sec)
+    {
+        yield return new WaitForSeconds(sec);
+        action?.Invoke();
+    }
     private void SetGrid()
     {
+        Debug.Log($"SetGrid {UtilManager.LocalID}");
         GridStart(transform.GetChild(0), isPlayer: true);
         GridStart(transform.GetChild(1), isPlayer: false);
 
-        for (int i = 0; i < transform.GetChild(0).childCount; i++)
+        for (int i = 0; i < transform.GetChild(0).childCount - 1; i++)
         {
             myMonsterMoveList.Add(transform.GetChild(0).GetChild(i).position);
         }
 
-        for (int i = 0; i < transform.GetChild(1).childCount; i++)
+        for (int i = 0; i < transform.GetChild(1).childCount - 1; i++)
         {
             otherMonsterMoveList.Add(transform.GetChild(1).GetChild(i).position);
         }
@@ -65,6 +82,7 @@ public partial class Spawner : NetworkBehaviour
 
     private void GridStart(Transform tr, bool isPlayer)
     {
+        Debug.Log($"GridStart {UtilManager.LocalID}");
         var parentSprite = tr.GetComponent<SpriteRenderer>();
         float parentSpriteWidth = parentSprite.bounds.size.x;
         float parentSpriteHeight = parentSprite.bounds.size.y;
@@ -86,12 +104,29 @@ public partial class Spawner : NetworkBehaviour
                 {
                     mySpawnList.Add(new Vector2(posX, posY + tr.position.y - gridHeight));
                     mySpawnedList.Add(false);
+                    Debug.Log($"mylistSize: {mySpawnList.Count} {mySpawnedList.Count}");
+                    // C2S_SpawnHeroHolder_ServerRpc(UtilManager.LocalID);
+
                 }
                 else
                 {
                     otherSpawnList.Add(new Vector2(posX, posY + tr.position.y));
                     otherSpawnedList.Add(false);
+                    Debug.Log($"mylistSize: {otherSpawnList.Count} {otherSpawnedList.Count}");
                 }
+
+                
+            }
+        }
+    }
+
+    private void GenerateSpawnHolder()
+    {
+        for (int row = 0; row < GRID_Y_COUNT; row++)
+        {
+            for (int col = 0; col < GRID_X_COUNT; col++)
+            {
+                C2S_SpawnHeroHolder_ServerRpc(UtilManager.LocalID);
             }
         }
     }
@@ -115,22 +150,14 @@ public partial class Spawner : NetworkBehaviour
 
     public void Summon(string holderName, string rarity)
     {                
-        C2S_SpawnHeroHolder_ServerRpc(UtilManager.LocalID, holderName, rarity);
+        C2S_SpawnHero_ServerRpc(UtilManager.LocalID, holderName, rarity);
 
     }
 
-    private void SetPositionHero(NetworkObject netObj, List<Vector2> spawnList, List<bool> spawnedList)
+    private void SetPositionHeroHolder(HeroHolder holder, List<Vector2> spawnList, List<bool> spawnedList)
     {
-        int positionValue = spawnedList.IndexOf(false);
-        if (positionValue == -1)
-        {
-            Debug.LogError("There is no place to spawn heroholder");
-            return;
-        }
-
-        spawnedList[positionValue] = true;
-        netObj.transform.position = spawnList[positionValue];
-        netObj.GetComponent<HeroHolder>().idx = positionValue;
+        spawnedList[holder.idx] = true;
+        holder.transform.position = spawnList[holder.idx];
     }
 
     public void SwapHoldersChanges(ulong clientId, int h1, int h2)
@@ -175,35 +202,40 @@ public partial class Spawner : NetworkBehaviour
         }
     }
 
+
+
     [ClientRpc]
-    private void BC_SpawnHeroHolder_ClientRpc(ulong netObjId, ulong clientid, HeroStatData data, string rarity)
+    private void BC_SpawnHeroHolder_ClientRpc(ulong netObjId, ulong clientId)
     {
         Debug.Log($"[S->C]{nameof(BC_SpawnHeroHolder_ClientRpc)}");
 
-        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(netObjId, out NetworkObject heroNetObj))
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(netObjId, out NetworkObject netObjHeroHolder))
         {
-            bool isPlayer = NetworkManager.Singleton.LocalClientId == clientid;
-            SetPositionHero(heroNetObj,
-                isPlayer ? mySpawnList : otherSpawnList,
-                isPlayer ? mySpawnedList : otherSpawnedList);
+            bool isPlayer = NetworkManager.Singleton.LocalClientId == clientId;
 
-            // sync holders between server and client
-            if (!IsHost)
+            if (!dicHolder.TryGetValue(clientId, out var heroHolders))
             {
-                if (!dicHolder.TryGetValue(clientid, out var heroHolders))
-                {
-                    dicHolder.Add(clientid, new());
-                }
-
-                var holder = heroNetObj.GetComponent<HeroHolder>();
-                var list = dicHolder[clientid];
-                int idx = FindFirstMissingIndex(list, x => x.idx);
-                holder.GetComponent<HeroHolder>().idx = idx;
-                dicHolder[clientid].Add(holder.GetComponent<HeroHolder>());
+                dicHolder.Add(clientId, new());
             }
 
-            heroNetObj.GetComponent<HeroHolder>().SpawnHero(data, clientid, rarity);
-            ++GameManager.Instance.HeroCount;
+            var holder = netObjHeroHolder.GetComponent<HeroHolder>();
+            
+            var list = dicHolder[clientId];
+            int idx = FindFirstMissingIndex(list, x => x.idx);
+            holder.idx = idx;
+            holder.clientId = clientId;
+            dicHolder[clientId].Add(holder);
+
+            Debug.LogWarning($"idx {idx}");
+            var list1 = isPlayer ? mySpawnList : otherSpawnList;
+            var list2 = isPlayer ? mySpawnedList : otherSpawnedList;
+            Debug.LogWarning($"idx {idx} {list1.Count} {list1.Count}");
+            SetPositionHeroHolder(holder,
+                list1,
+                list2);
+
+
+            Debug.LogWarning($"IsPlayer{isPlayer} clientId: {clientId}, dic »çÀÌÁî: {dicHolder[clientId].Count}");
         }
     }
 
@@ -222,7 +254,7 @@ public partial class Spawner : NetworkBehaviour
 
     private HeroHolder FindEmptyHereHolderOrNull(ulong clientid, string hereName)
     {
-        return dicHolder[clientid].FindAll((holder) => holder.HolderName == hereName && holder.Heros.Count < 3).FirstOrDefault();
+        return dicHolder[clientid].FindAll((holder) => (holder.HolderName == hereName && holder.Heros.Count < 3) || (holder.HolderName.IsNullOrEmpty())).FirstOrDefault();
     }
 
     #endregion
