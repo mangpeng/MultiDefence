@@ -29,28 +29,25 @@ public partial class Spawner
         }
 
     }
-    private void HeroSpawn(ulong clientid, string holderName, string rarity)
+    private void HeroSpawn(ulong clientid, string holderName, string rarity, HeroStatData data)
     {
         if (!IsServer)
             return;
-
-        HeroStat[] datas = Resources.LoadAll<HeroStat>("HeroData/Common");
-        var data = datas[UnityEngine.Random.Range(0, datas.Length)];
 
         var newPath = "";
         if (rarity == "Uncommon")
         {
             newPath = $"HeroData/{rarity}/{holderName}(Uncommon)";
-            data = Resources.Load<HeroStat>(newPath);
+            data = Resources.Load<HeroStat>(newPath).GetData();
         }
 
-        var emptyHolder = FindEmptyHereHolderOrNull(clientid, data.Name);
+        var emptyHolder = FindEmptyHereHolderOrNull(clientid, data.heroName);
         if(emptyHolder == null)
         {
             Debug.LogWarning("There are not enought heroholder");
         }
 
-        emptyHolder.SpawnHero(clientid, data.GetData(), rarity);
+        emptyHolder.SpawnHero(clientid, data, rarity);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -65,10 +62,10 @@ public partial class Spawner
 
     #region RPC
     [ServerRpc(RequireOwnership = false)]
-    private void C2S_SpawnHero_ServerRpc(ulong clientid, string holderName, string rarity)
+    private void C2S_SpawnHero_ServerRpc(ulong clientid, string holderName, string rarity, HeroStatData data)
     {
         Debug.Log($"[C->S]{nameof(C2S_SpawnHeroHolder_ServerRpc)}");
-        HeroSpawn(clientid, holderName, rarity);
+        HeroSpawn(clientid, holderName, rarity, data);
     }
 
     [ServerRpc(RequireOwnership = false)]

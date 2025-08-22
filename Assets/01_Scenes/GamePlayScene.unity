@@ -417,7 +417,7 @@ GameObject:
   - component: {fileID: 171169183}
   - component: {fileID: 171169182}
   m_Layer: 5
-  m_Name: btnSummon (1)
+  m_Name: btnUpgrade
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2578,6 +2578,9 @@ MonoBehaviour:
   txtNavigation: {fileID: 336102390}
   trNavigation: {fileID: 1224927634}
   animAsset: {fileID: 334465745}
+  btnSummon: {fileID: 423463544}
+  prfTrail: {fileID: 503155262830013008, guid: beabaec7d99770e4094194bdb666b1bf, type: 3}
+  trailSpeed: 10
 --- !u!1 &826282284
 GameObject:
   m_ObjectHideFlags: 0

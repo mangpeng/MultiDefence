@@ -87,7 +87,7 @@ public partial class HeroHolder : NetworkBehaviour
 
         // FIXME
         GameManager.Instance.HeroCount -= 2;
-        Spawner.instance.Summon(tmpHolderName, "Uncommon");
+        Spawner.instance.Summon(tmpHolderName, "Uncommon", null);
     }
     #endregion
     #region UI

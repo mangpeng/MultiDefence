@@ -133,7 +133,7 @@ public partial class Spawner : NetworkBehaviour
     #endregion
 
     #region Summon
-    public void Summon(string rarity)
+    public void Summon(string rarity, HeroStat data)
     {
         if (GameManager.Instance.Money < GameManager.Instance.SummonNeedMoney)
             return;
@@ -145,12 +145,12 @@ public partial class Spawner : NetworkBehaviour
         GameManager.Instance.SummonNeedMoney += 2;
         ++GameManager.Instance.HeroCount;
 
-        Summon("", rarity);
+        Summon("", rarity, data);
     }
 
-    public void Summon(string holderName, string rarity)
+    public void Summon(string holderName, string rarity, HeroStat data = null)
     {                
-        C2S_SpawnHero_ServerRpc(UtilManager.LocalID, holderName, rarity);
+        C2S_SpawnHero_ServerRpc(UtilManager.LocalID, holderName, rarity, data ? data.GetData() : new HeroStatData());
 
     }
 
@@ -252,9 +252,15 @@ public partial class Spawner : NetworkBehaviour
         return i;
     }
 
-    private HeroHolder FindEmptyHereHolderOrNull(ulong clientid, string hereName)
+    public HeroHolder FindEmptyHereHolderOrNull(ulong clientid, string hereName)
     {
         return dicHolder[clientid].FindAll((holder) => (holder.HolderName == hereName && holder.Heros.Count < 3) || (holder.HolderName.IsNullOrEmpty())).FirstOrDefault();
+    }
+
+    public HeroStat GetRandomHeroCommonData()
+    {
+        HeroStat[] datas = Resources.LoadAll<HeroStat>("HeroData/Common");
+        return datas[UnityEngine.Random.Range(0, datas.Length)];
     }
 
     #endregion

@@ -1,7 +1,9 @@
 using NUnit.Framework;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,6 +21,9 @@ public class UIMain : Singleton<UIMain>
     [SerializeField] private Transform trNavigation;
 
     [SerializeField] private Animator animAsset;
+    [SerializeField] private Button btnSummon;
+    [SerializeField] private GameObject prfTrail;
+    [SerializeField] private float trailSpeed;
 
     private List<TextMeshProUGUI> listNaviTxt = new();
 
@@ -30,9 +35,10 @@ public class UIMain : Singleton<UIMain>
     private void Start()
     {
         GameManager.Instance.OnMoney += MoneyAni;
-
         GameManager.Instance.OnUpdateUIWave += UpdateUIWave;
         GameManager.Instance.OnUpdateUITime += UpdateUITime;
+
+        btnSummon.onClick.AddListener(BtnSummon);
     }
 
     private void Update()
@@ -48,6 +54,36 @@ public class UIMain : Singleton<UIMain>
 
     #region UI
 
+    public void BtnSummon()
+    {
+        StartCoroutine(CoSummonTrail());
+    }
+
+    IEnumerator CoSummonTrail()
+    {
+        var data = Spawner.instance.GetRandomHeroCommonData();
+        var emptyHolder = Spawner.instance.FindEmptyHereHolderOrNull(UtilManager.LocalID, data.Name);
+        
+        if(emptyHolder == null)
+        {
+            Debug.LogError("Not enough to place a new hero");
+        }
+
+        var btnSummonWorldPos = Camera.main.ScreenToWorldPoint(btnSummon.transform.position);
+        var go = Instantiate(prfTrail);
+        go.transform.position = btnSummonWorldPos;
+
+        var target = emptyHolder.transform.position;
+        while (Vector3.Distance(go.transform.position, target) > 0.1f)
+        {
+            go.transform.position = Vector3.MoveTowards(go.transform.position, target, Time.deltaTime * trailSpeed);
+            yield return null;
+        }
+
+        Destroy(go);
+        
+        Spawner.instance.Summon("Common", data);
+    }
     public void AddNavigationText(string msg)
     {
         if(listNaviTxt.Count > 7)
