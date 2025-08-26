@@ -17,3 +17,5 @@ MonoBehaviour:
   ATK_Speed: 1
   Range: 1
   animatorController: {fileID: 9100000, guid: c8970a96f705ed04caf2d9650dcac208, type: 2}
+  rarity: 0
+  prfBullet: {fileID: 8937217233303440734, guid: 46d14921287c7834c9c7361e541f1f3d, type: 3}

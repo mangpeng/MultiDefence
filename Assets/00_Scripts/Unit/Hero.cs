@@ -25,7 +25,7 @@ public class Hero : Character
 
     public void Initdata(HeroStatData data, HeroHolder holder, string rarity)
     {
-        
+        m_Data = Resources.Load<HeroStat>($"HeroData/{rarity}/{data.heroName}");
 
         attackRange = data.heroRange;
         ATK = data.heroAtk;
@@ -126,9 +126,16 @@ public class Hero : Character
             {
                 attackSpeed = 0.0f;
                 AnimChange("ATTACK", true);
-                CS_AttackMonsterServerRpc(attackTarget.GetComponent<NetworkObject>().NetworkObjectId);
+                GetBullet();
+                // CS_AttackMonsterServerRpc(attackTarget.GetComponent<NetworkObject>().NetworkObjectId);
             }
         }
+    }
+
+    public void GetBullet()
+    {
+        var go = Instantiate<Bullet>(m_Data.prfBullet, transform.position + new Vector3(0.0f, 0.1f), Quaternion.identity);
+        go.Init(attackTarget.transform, this);
     }
 
     public void Sell(ulong clientId, ActionContext ctx)
@@ -136,9 +143,16 @@ public class Hero : Character
         parentHolder.C2S_SellHero_ServerRpc(clientId, ctx);
     }
 
+    public void SetDamage()
+    {
+        if (attackTarget == null) return;
+
+        CS_AttackMonsterServerRpc(attackTarget.GetComponent<NetworkObject>().NetworkObjectId);
+    }
+
     #region Network
     [ServerRpc(RequireOwnership = false)]
-    private void CS_AttackMonsterServerRpc(ulong targetId)
+    public void CS_AttackMonsterServerRpc(ulong targetId)
     {
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(targetId, out var netObj))
         {

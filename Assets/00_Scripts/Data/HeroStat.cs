@@ -27,6 +27,7 @@ public class HeroStat : ScriptableObject
     public float Range;
     public RuntimeAnimatorController animatorController;
     public Rarity rarity;
+    public Bullet prfBullet;
 
     public HeroStatData GetData()
     {

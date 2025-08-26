@@ -135,16 +135,6 @@ public partial class Spawner : NetworkBehaviour
     #region Summon
     public void Summon(string rarity, HeroStat data)
     {
-        if (GameManager.Instance.Money < GameManager.Instance.SummonNeedMoney)
-            return;
-
-        if (GameManager.Instance.HeroCount >= GameManager.MAX_HERO_COUNT)
-            return;
-
-        GameManager.Instance.Money -= GameManager.Instance.SummonNeedMoney;
-        GameManager.Instance.SummonNeedMoney += 2;
-        ++GameManager.Instance.HeroCount;
-
         Summon("", rarity, data);
     }
 
