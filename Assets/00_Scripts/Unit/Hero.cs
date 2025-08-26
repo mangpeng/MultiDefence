@@ -9,7 +9,16 @@ using UnityEngine.InputSystem.Switch;
 
 public class Hero : Character
 {
-    public int ATK;
+    public int ATK
+    {
+        get
+        {
+            var addAtk = GameManager.Instance.mUpgrade[UpgradeIndex()] == 0 ? 100 : (100 + GameManager.Instance.mUpgrade[UpgradeIndex()] * 10);
+            return (int)(m_Data.ATK * (addAtk / 100.0f));
+        }
+        set { }
+    }
+
     [SerializeField] private float attackRange = 1.0f;
     private float attackSpeed = 0.0f;
 
@@ -22,6 +31,23 @@ public class Hero : Character
     bool isMove = false;
 
     [SerializeField] private GameObject prfSpawnEffect;
+
+    private int UpgradeIndex()
+    {
+        switch (m_Data.rarity)
+        {
+            case Rarity.Common:
+            case Rarity.Uncommon:
+            case Rarity.Rare:
+                return 0;
+            case Rarity.Hero: 
+                return 1;
+            case Rarity.Lengendary:
+                return 2;
+        }
+
+        return 0;
+    }
 
     public void Initdata(HeroStatData data, HeroHolder holder, string rarity)
     {
@@ -166,3 +192,4 @@ public class Hero : Character
 
     #endregion
 }
+

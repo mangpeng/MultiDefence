@@ -25,6 +25,8 @@ public partial class GameManager : NetworkBehaviour
 
     public event OnMoneyEventHandler OnMoney;
 
+    public int[] mUpgrade = new int[4];
+
     private void Start()
     {
         if (IsServer)

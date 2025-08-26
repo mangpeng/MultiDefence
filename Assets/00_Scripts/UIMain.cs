@@ -31,6 +31,11 @@ public class UIMain : Singleton<UIMain>
     [SerializeField] private float yPosMin, yPosMax;
     [SerializeField] private float xPos;
 
+    [Header("##Upgarde")]
+    [SerializeField] private TextMeshProUGUI mTxtUgradeMoney;
+    [SerializeField] private TextMeshProUGUI[] mTxtUgradeLevel;
+    [SerializeField] private TextMeshProUGUI[] mTxtUgradeAsset;
+
 
     private List<TextMeshProUGUI> listNaviTxt = new();
 
@@ -57,9 +62,27 @@ public class UIMain : Singleton<UIMain>
         txtSummon.text = GameManager.Instance.SummonNeedMoney.ToString();
         txtMoney.text = GameManager.Instance.Money.ToString();    
         txtSummon.color = GameManager.Instance.Money >= GameManager.Instance.SummonNeedMoney ? Color.white : Color.gray;
-    }
 
+        mTxtUgradeMoney.text = GameManager.Instance.Money.ToString();
+        for (int i = 0; i < mTxtUgradeLevel.Length; i++)
+        {
+            mTxtUgradeLevel[i].text = $"Lv.{GameManager.Instance.mUpgrade[i] + 1}";
+            mTxtUgradeAsset[i].text = $"{30 + GameManager.Instance.mUpgrade[i]}";
+        }
+    }
+    
     #region UI
+    public void OnUpgrade(int idx)
+    {
+        var curMoney = GameManager.Instance.Money;
+        var needMoney = 30 + GameManager.Instance.mUpgrade[idx];
+
+        if (curMoney < needMoney)
+            return;
+
+        GameManager.Instance.Money -= needMoney;
+        ++GameManager.Instance.mUpgrade[idx];
+    }
 
     public void BtnSummon()
     {
