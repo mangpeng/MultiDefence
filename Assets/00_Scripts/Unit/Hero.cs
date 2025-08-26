@@ -21,15 +21,21 @@ public class Hero : Character
 
     bool isMove = false;
 
+    [SerializeField] private GameObject prfSpawnEffect;
+
     public void Initdata(HeroStatData data, HeroHolder holder, string rarity)
     {
+        
+
         attackRange = data.heroRange;
         ATK = data.heroAtk;
         attackSpeed = data.heroAtk_speed;
         parentHolder = holder;
         GetInitCharacter(data.heroName, rarity);
+        
+        Instantiate(prfSpawnEffect, transform.parent.position, Quaternion.identity);
 
-        if(rarity == "Uncommon")
+        if (rarity == "Uncommon")
         {
             sprRr.color = Color.red;
         }

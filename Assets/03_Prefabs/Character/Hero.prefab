@@ -77,6 +77,7 @@ MonoBehaviour:
   attackRange: 1
   m_Data: {fileID: 11400000, guid: ce73efdb5373f7943b52f7f3015a7ecd, type: 2}
   parentHolder: {fileID: 0}
+  prfSpawnEffect: {fileID: 1361071568481113373, guid: ef5774f5afe6e5d45aa13fe8ca2c6ea5, type: 3}
 --- !u!1 &7718687759368404814
 GameObject:
   m_ObjectHideFlags: 0
