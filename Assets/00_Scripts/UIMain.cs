@@ -31,6 +31,7 @@ public class UIMain : Singleton<UIMain>
     [SerializeField] private float yPosMin, yPosMax;
     [SerializeField] private float xPos;
 
+
     private List<TextMeshProUGUI> listNaviTxt = new();
 
     protected override void Awake()
