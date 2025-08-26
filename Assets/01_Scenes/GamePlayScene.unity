@@ -2580,7 +2580,10 @@ MonoBehaviour:
   animAsset: {fileID: 334465745}
   btnSummon: {fileID: 423463544}
   prfTrail: {fileID: 503155262830013008, guid: beabaec7d99770e4094194bdb666b1bf, type: 3}
-  trailSpeed: 10
+  trailSpeed: 0.5
+  yPosMin: 1
+  yPosMax: 3
+  xPos: 5
 --- !u!1 &826282284
 GameObject:
   m_ObjectHideFlags: 0

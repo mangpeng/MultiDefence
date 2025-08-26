@@ -22,8 +22,14 @@ public class UIMain : Singleton<UIMain>
 
     [SerializeField] private Animator animAsset;
     [SerializeField] private Button btnSummon;
+
+    [Header("##TrailEffect")]
     [SerializeField] private GameObject prfTrail;
     [SerializeField] private float trailSpeed;
+    
+    [UnityEngine.Range(0.0f, 30.0f)]
+    [SerializeField] private float yPosMin, yPosMax;
+    [SerializeField] private float xPos;
 
     private List<TextMeshProUGUI> listNaviTxt = new();
 
@@ -59,6 +65,18 @@ public class UIMain : Singleton<UIMain>
         StartCoroutine(CoSummonTrail());
     }
 
+    private Vector3 GenerateRandomPoint(Vector3 start, Vector3 end)
+    {
+        var mid = (start + end) / 2;
+
+        float randomHeight = Random.Range(yPosMin, yPosMax);
+        mid += Vector3.up * randomHeight;
+
+        mid += new Vector3(Random.Range(-xPos, xPos), 0.0f);
+
+        return mid;
+    }
+
     IEnumerator CoSummonTrail()
     {
         var data = Spawner.instance.GetRandomHeroCommonData();
@@ -74,16 +92,38 @@ public class UIMain : Singleton<UIMain>
         go.transform.position = btnSummonWorldPos;
 
         var target = emptyHolder.transform.position;
-        while (Vector3.Distance(go.transform.position, target) > 0.1f)
+
+        var startPoint = btnSummonWorldPos;
+        var endPoint = target;
+        var midControlPoint = GenerateRandomPoint(startPoint, endPoint);
+
+        float elapsedTime = 0.0f;
+        while(elapsedTime < trailSpeed)
         {
-            go.transform.position = Vector3.MoveTowards(go.transform.position, target, Time.deltaTime * trailSpeed);
+            var t = elapsedTime / trailSpeed;
+            Vector3 curvePos = CalculateBezierCurve(t, startPoint, midControlPoint, endPoint);
+            go.transform.position = new Vector3(curvePos.x, curvePos.y, 0);
+
+            elapsedTime += Time.deltaTime;
             yield return null;
         }
+
+        //while (Vector3.Distance(go.transform.position, target) > 0.1f)
+        //{
+        //    go.transform.position = Vector3.MoveTowards(go.transform.position, target, Time.deltaTime * trailSpeed);
+        //    yield return null;
+        //}
 
         Destroy(go);
         
         Spawner.instance.Summon("Common", data);
     }
+
+    private Vector3 CalculateBezierCurve(float t, Vector3 p0, Vector3 p1, Vector3 p2)
+    {
+        return Mathf.Pow(1 - t, 2) * p0 + 2 * (1 - t) * t * p1 + Mathf.Pow(t, 2) * p2;
+    }
+
     public void AddNavigationText(string msg)
     {
         if(listNaviTxt.Count > 7)
