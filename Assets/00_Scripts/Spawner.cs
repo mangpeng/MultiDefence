@@ -166,6 +166,7 @@ public partial class Spawner : NetworkBehaviour
 
         (holder1.Heros, holder2.Heros) = (holder2.Heros, holder1.Heros);
         (holder1.HolderName, holder2.HolderName) = (holder2.HolderName, holder1.HolderName);
+        (holder1.heroData, holder2.heroData) = (holder2.heroData, holder1.heroData);
     }
 
     #endregion

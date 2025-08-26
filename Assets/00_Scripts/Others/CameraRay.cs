@@ -1,6 +1,7 @@
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using WebSocketSharp;
 
 public class CameraRay : NetworkBehaviour
 {
@@ -38,6 +39,13 @@ public class CameraRay : NetworkBehaviour
         if (hit.collider != null)
         {
             holder = hit.collider.GetComponent<HeroHolder>();
+
+            if (holder.HolderName.IsNullOrEmpty())
+            {
+                holder = null;
+                return;
+            }
+
             if (NetworkManager.Singleton.LocalClientId != holder.clientId)
             {
                 holder = null;
@@ -58,10 +66,18 @@ public class CameraRay : NetworkBehaviour
         var hit = Physics2D.Raycast(ray.origin, ray.direction);
         if (hit.collider != null)
         {
-            if(colHolder != null) colHolder.ShowSquare(false);
-
+            colHolder?.ShowSquare(false);
             colHolder = hit.collider.GetComponent<HeroHolder>();
-            if(colHolder != null && colHolder != holder)
+
+            if(colHolder.clientId != UtilManager.LocalID)
+            {
+                colHolder = null; 
+                return;
+            }
+                
+            if (colHolder != null) colHolder.ShowSquare(false);
+            
+            if(colHolder != holder)
             {
                 colHolder.ShowSquare(true);
             } else
