@@ -25,13 +25,26 @@ public partial class Monster : Character
 
     protected void Start()
     {
-        HP = MaxHP;
+        HP = (int)CalcuateMonsterHp(GameManager.Instance.curWave);
         InitTarget();
     }
 
     public void Init(List<Vector2> moveList)
     {
         this.moveList = moveList;
+    }
+
+    double CalcuateMonsterHp(int waveLevel)
+    {
+        var baseHp = 50.0f;
+        var powerMultiplier = Mathf.Pow(1.1f, waveLevel);
+
+        if(waveLevel % 10 == 0)
+        {
+            powerMultiplier += 0.05f * (waveLevel / 10);
+        }
+
+        return baseHp * powerMultiplier;
     }
 
     private void Update()

@@ -147,10 +147,10 @@ TextureImporter:
       name: Red_die_1-sheet_0
       rect:
         serializedVersion: 2
-        x: 329
-        y: 264
-        width: 160
-        height: 101
+        x: 0
+        y: 0
+        width: 800
+        height: 800
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -169,10 +169,10 @@ TextureImporter:
       name: Red_die_1-sheet_1
       rect:
         serializedVersion: 2
-        x: 1130
-        y: 264
-        width: 158
-        height: 109
+        x: 800
+        y: 0
+        width: 800
+        height: 800
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -191,10 +191,10 @@ TextureImporter:
       name: Red_die_1-sheet_2
       rect:
         serializedVersion: 2
-        x: 1933
-        y: 264
-        width: 152
-        height: 114
+        x: 1600
+        y: 0
+        width: 800
+        height: 800
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -213,10 +213,10 @@ TextureImporter:
       name: Red_die_1-sheet_3
       rect:
         serializedVersion: 2
-        x: 2730
-        y: 264
-        width: 158
-        height: 109
+        x: 2400
+        y: 0
+        width: 800
+        height: 800
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -235,10 +235,10 @@ TextureImporter:
       name: Red_die_1-sheet_4
       rect:
         serializedVersion: 2
-        x: 3522
-        y: 264
-        width: 174
-        height: 99
+        x: 3200
+        y: 0
+        width: 800
+        height: 800
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -257,10 +257,10 @@ TextureImporter:
       name: Red_die_1-sheet_5
       rect:
         serializedVersion: 2
-        x: 4305
-        y: 260
-        width: 205
-        height: 93
+        x: 4000
+        y: 0
+        width: 800
+        height: 800
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -279,10 +279,10 @@ TextureImporter:
       name: Red_die_1-sheet_6
       rect:
         serializedVersion: 2
-        x: 5093
-        y: 259
-        width: 227
-        height: 84
+        x: 4800
+        y: 0
+        width: 800
+        height: 800
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -301,7 +301,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 24d0ba2f9c6f0fc4d95939ce4b82edf6
     internalID: 0
     vertices: []
     indices: 

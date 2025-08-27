@@ -7,25 +7,28 @@ public class Bullet : MonoBehaviour
 
     private Hero mHero;
 
-    private Transform target;
+    private Vector3? targetPos = null;
     private int mDamage;
 
     void Update()
     {
-        float distance = Vector2.Distance(transform.position, target.position);
+        if (!targetPos.HasValue)
+            return;
+
+        float distance = Vector2.Distance(transform.position, targetPos.Value);
         if(distance >= 0.1f) {
-            transform.position = Vector2.MoveTowards(transform.position, target.position, mSpeed * Time.deltaTime);
+            transform.position = Vector2.MoveTowards(transform.position, targetPos.Value, mSpeed * Time.deltaTime);
         } else
         {
             Instantiate(prfDestroy, transform.position, Quaternion.identity);
-            Destroy(this.gameObject);
             mHero.SetDamage();
+            Destroy(this.gameObject);
         }
     }
 
     public void Init(Transform t, Hero hero)
     {
-        target = t;
+        targetPos = t.transform.position;
         mHero = hero;
     }
 }

@@ -5005,7 +5005,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57ee81d80f7cb3b4d9ca7b92b927027e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mSpeed: 3
+  mSpeed: 5
   prfDestroy: {fileID: 2971672962581414212, guid: 379398e0e8abde9409e40aaa885ffc21, type: 3}
 --- !u!1 &5401227114798146235
 GameObject:

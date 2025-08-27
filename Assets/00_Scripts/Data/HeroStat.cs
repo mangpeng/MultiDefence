@@ -12,10 +12,16 @@ public struct HeroStatData : INetworkSerializable
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
+        if (serializer.IsWriter)
+        {
+            heroName ??= string.Empty;
+        }
+
         serializer.SerializeValue(ref heroName);
         serializer.SerializeValue(ref heroAtk);
         serializer.SerializeValue(ref heroAtk_speed);
         serializer.SerializeValue(ref heroRange);
+        serializer.SerializeValue(ref heroRarity);
     }
 }
 [CreateAssetMenu(fileName = "HeroStat", menuName = "Scriptable Objects/HeroStat")]

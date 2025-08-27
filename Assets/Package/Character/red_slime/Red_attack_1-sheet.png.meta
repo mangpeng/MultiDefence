@@ -96,7 +96,7 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 2048
+    maxTextureSize: 4096
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
@@ -153,10 +153,10 @@ TextureImporter:
       name: Red_attack_1-sheet_0
       rect:
         serializedVersion: 2
-        x: 329
-        y: 264
-        width: 160
-        height: 101
+        x: 0
+        y: 0
+        width: 800
+        height: 800
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -175,10 +175,10 @@ TextureImporter:
       name: Red_attack_1-sheet_1
       rect:
         serializedVersion: 2
-        x: 1126
-        y: 263
-        width: 164
-        height: 129
+        x: 800
+        y: 0
+        width: 800
+        height: 800
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -197,10 +197,10 @@ TextureImporter:
       name: Red_attack_1-sheet_2
       rect:
         serializedVersion: 2
-        x: 1928
-        y: 265
-        width: 160
-        height: 153
+        x: 1600
+        y: 0
+        width: 800
+        height: 800
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -219,10 +219,10 @@ TextureImporter:
       name: Red_attack_1-sheet_3
       rect:
         serializedVersion: 2
-        x: 2741
-        y: 265
-        width: 138
-        height: 178
+        x: 2400
+        y: 0
+        width: 800
+        height: 800
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -241,10 +241,10 @@ TextureImporter:
       name: Red_attack_1-sheet_4
       rect:
         serializedVersion: 2
-        x: 3498
-        y: 264
-        width: 171
-        height: 170
+        x: 3200
+        y: 0
+        width: 800
+        height: 800
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -263,10 +263,10 @@ TextureImporter:
       name: Red_attack_1-sheet_5
       rect:
         serializedVersion: 2
-        x: 4347
-        y: 264
-        width: 227
-        height: 168
+        x: 4000
+        y: 0
+        width: 800
+        height: 800
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -285,10 +285,10 @@ TextureImporter:
       name: Red_attack_1-sheet_6
       rect:
         serializedVersion: 2
-        x: 5172
-        y: 265
-        width: 233
-        height: 87
+        x: 4800
+        y: 0
+        width: 800
+        height: 800
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -307,10 +307,10 @@ TextureImporter:
       name: Red_attack_1-sheet_7
       rect:
         serializedVersion: 2
-        x: 5953
-        y: 263
-        width: 188
-        height: 105
+        x: 5600
+        y: 0
+        width: 800
+        height: 800
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -329,10 +329,10 @@ TextureImporter:
       name: Red_attack_1-sheet_8
       rect:
         serializedVersion: 2
-        x: 6740
-        y: 264
-        width: 161
-        height: 118
+        x: 6400
+        y: 0
+        width: 800
+        height: 800
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -351,7 +351,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: f010eb86f783a9343a385d46cd3b2874
     internalID: 0
     vertices: []
     indices: 

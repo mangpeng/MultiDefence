@@ -93,7 +93,7 @@ public partial class GameManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    private void BC_UpdateTime_ClientRpc(int remainTime, int curWave)
+    private void BC_UpdateTime_ClientRpc(int remainTime, int curWave, bool changedWave)
     {
         // Debug.Log($"[S->C]{nameof(BC_UpdateTime_ClientRpc)}");
 
@@ -102,6 +102,11 @@ public partial class GameManager : NetworkBehaviour
 
         OnUpdateUIWave?.Invoke();
         OnUpdateUITime?.Invoke();
+
+        if(changedWave)
+        {
+            UIMain.Instance.OnWavePopup(curWave);
+        }
     }
     #endregion
 }

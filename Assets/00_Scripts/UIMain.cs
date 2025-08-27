@@ -36,6 +36,9 @@ public class UIMain : Singleton<UIMain>
     [SerializeField] private TextMeshProUGUI[] mTxtUgradeLevel;
     [SerializeField] private TextMeshProUGUI[] mTxtUgradeAsset;
 
+    [Header("##Others")]
+    [SerializeField] private GameObject popUpWave;
+    [SerializeField] private TextMeshProUGUI popUpWavetxt;
 
     private List<TextMeshProUGUI> listNaviTxt = new();
 
@@ -72,6 +75,13 @@ public class UIMain : Singleton<UIMain>
     }
     
     #region UI
+
+    public void OnWavePopup(int wave)
+    {
+        popUpWave.gameObject.SetActive(true);
+        popUpWavetxt.text = $"WAVE {wave:D2}";
+    }
+
     public void OnUpgrade(int idx)
     {
         var curMoney = GameManager.Instance.Money;

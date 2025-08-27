@@ -32,6 +32,10 @@ public class Hero : Character
 
     [SerializeField] private GameObject prfSpawnEffect;
 
+    public Color[] circleColor;
+    public SpriteRenderer circleSrr;
+
+
     private int UpgradeIndex()
     {
         switch (m_Data.rarity)
@@ -57,6 +61,7 @@ public class Hero : Character
         ATK = data.heroAtk;
         attackSpeed = data.heroAtk_speed;
         parentHolder = holder;
+        circleSrr.color = circleColor[(int)data.heroRarity]; 
         GetInitCharacter(data.heroName, rarity);
         
         Instantiate(prfSpawnEffect, transform.parent.position, Quaternion.identity);
@@ -172,6 +177,22 @@ public class Hero : Character
     public void SetDamage()
     {
         if (attackTarget == null) return;
+
+        // 합성으로 인해 공격 시도한 히어로의 NetworkObject가 의미 무효일 수 있음
+        var no = NetworkObject;
+        if (no == null || !no.IsSpawned)
+        {
+            Debug.LogWarning($"[Hero] Cannot send ServerRpc. NetworkObject null or not spawned. no={no != null} spawned={no?.IsSpawned}");
+            return;
+        }
+
+        // 공격 대상 몬스터의 NetworkObject가 의미 무효일 수 있음
+        var targetNO = attackTarget.GetComponent<NetworkObject>();
+        if (targetNO == null || !targetNO.IsSpawned)
+        {
+            Debug.LogWarning($"[Hero] Target invalid for RPC. targetNO={(targetNO != null)} spawned={targetNO?.IsSpawned}");
+            return;
+        }
 
         CS_AttackMonsterServerRpc(attackTarget.GetComponent<NetworkObject>().NetworkObjectId);
     }

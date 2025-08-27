@@ -18,3 +18,4 @@ MonoBehaviour:
   Range: 15
   animatorController: {fileID: 9100000, guid: 2d6f998e3dc9b6549a9b522b35810935, type: 2}
   rarity: 1
+  prfBullet: {fileID: 8937217233303440734, guid: 46d14921287c7834c9c7361e541f1f3d, type: 3}
