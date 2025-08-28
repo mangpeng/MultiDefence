@@ -9,6 +9,8 @@ using UnityEngine.UI;
 
 public partial class Monster
 {
+    private Coroutine mCoSlow;
+
     public void GetDamage(int dmg)
     {
         if (!IsServer) return;
@@ -33,6 +35,20 @@ public partial class Monster
         {
             BC_Hit_ClientRpc(HP, dmg);
         }
+    }
+
+
+    private IEnumerator CoSlow(float slowAmount, float slowDuration)
+    {
+        sprRr.color = Color.blue;
+        var newSpeed = mSpeed - (mSpeed * slowAmount);
+        newSpeed = Mathf.Max(newSpeed, 0.1f);
+        mSpeed = newSpeed;
+
+        yield return new WaitForSeconds(slowDuration);
+        sprRr.color = Color.white;
+        mSpeed = MOVE_SPEED;
+        mCoSlow = null;
     }
 
     #region RPC

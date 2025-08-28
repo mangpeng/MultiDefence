@@ -35,6 +35,9 @@ public class Hero : Character
     public Color[] circleColor;
     public SpriteRenderer circleSrr;
 
+    public float mSlowChacne = 0.3f;
+    public float mSlowAmount = 0.3f;
+    public float mSlowDuration = 2.0f;
 
     private int UpgradeIndex()
     {
@@ -208,6 +211,12 @@ public class Hero : Character
                 return;
 
             monster.GetDamage(ATK);
+
+            bool isSlow = Random.value < mSlowChacne;
+            if(isSlow)
+            {
+                monster.BC_Slow_ClientRpc(mSlowAmount, mSlowDuration);
+            }
         }
     }
 

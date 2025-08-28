@@ -13,6 +13,7 @@ public partial class Monster : Character
 
     [Header("Variables")]
     [SerializeField] private float MOVE_SPEED = 1;
+    private float mSpeed = 1;
 
     public TextAni txtHit;
     public Image imgHp;
@@ -29,6 +30,7 @@ public partial class Monster : Character
     {
         HP = (int)CalcuateMonsterHp(GameManager.Instance.curWave);
         MaxHP = HP; // ??...
+        mSpeed = MOVE_SPEED;
         InitTarget();
     }
 
@@ -60,7 +62,7 @@ public partial class Monster : Character
         if (moveList.Count == 0)
             return;
 
-        transform.position = Vector2.MoveTowards(transform.position, curTarget, Time.deltaTime * MOVE_SPEED);
+        transform.position = Vector2.MoveTowards(transform.position, curTarget, Time.deltaTime * mSpeed);
 
         // Check next target and Change
         if (CanChangeTarget())
@@ -165,6 +167,16 @@ public partial class Monster : Character
             yield return null;
         }
     }
+    public void Slow(float slowAmount, float slowDuration)
+    {
+        if (mCoSlow != null)
+        {
+            return;
+            // StopCoroutine(mCoSlow);
+        }
+
+        mCoSlow = StartCoroutine(CoSlow(slowAmount, slowDuration));
+    }
 
     #region RPC
     [ClientRpc]
@@ -180,6 +192,12 @@ public partial class Monster : Character
         imgHp.fillAmount = (float)HP / MaxHP;
 
         Instantiate(txtHit, transform.position, Quaternion.identity).Initialize(dmg);
+    }
+
+    [ClientRpc]
+    public void BC_Slow_ClientRpc(float slowAmount, float slowDuration)
+    {
+        Slow(slowAmount, slowDuration);
     }
 
     [ClientRpc]
