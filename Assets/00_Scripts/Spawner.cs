@@ -46,15 +46,7 @@ public partial class Spawner : NetworkBehaviour
     
     void Start()
     {
-        Debug.Log("STart");
-        SetGrid();
-        StartCoroutine(CDealy(() =>
-        {
-            Debug.Log("Delay");
-            // SetGrid();
-            StartCoroutine(CSpawnMonster());
-            GenerateSpawnHolder();
-        }, 5f));
+        StartServer();
     }
 
     #region Grid
@@ -181,7 +173,7 @@ public partial class Spawner : NetworkBehaviour
     }
 
     [ClientRpc]
-    private void BC_MonsterSpawnClientRpc(ulong netObjId, ulong clientid)
+    private void BC_MonsterSpawnClientRpc(ulong netObjId, ulong clientid, bool isBoss = false)
     {
         // Debug.Log($"[S->C]{nameof(BC_MonsterSpawnClientRpc)}");
 

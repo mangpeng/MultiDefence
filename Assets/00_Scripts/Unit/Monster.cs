@@ -9,6 +9,8 @@ using UnityEngine.UI;
 
 public partial class Monster : Character
 {
+    public bool isBoss = false;
+
     [Header("Variables")]
     [SerializeField] private float MOVE_SPEED = 1;
 
@@ -26,6 +28,7 @@ public partial class Monster : Character
     protected void Start()
     {
         HP = (int)CalcuateMonsterHp(GameManager.Instance.curWave);
+        MaxHP = HP; // ??...
         InitTarget();
     }
 
@@ -44,7 +47,7 @@ public partial class Monster : Character
             powerMultiplier += 0.05f * (waveLevel / 10);
         }
 
-        return baseHp * powerMultiplier;
+        return baseHp * powerMultiplier * (isBoss ? 10 : 1);
     }
 
     private void Update()

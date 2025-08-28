@@ -6,7 +6,19 @@ using UnityEngine;
 
 public partial class Spawner
 {
-    IEnumerator CSpawnMonster()
+    Coroutine cSpawnMonster;
+
+    private void StartServer()
+    {
+        SetGrid();
+        StartCoroutine(CDealy(() =>
+        {
+            GenerateSpawnHolder();
+            cSpawnMonster = StartCoroutine(CSpawnMonster(isBoss: false));
+        }, 5f));
+    } 
+
+    IEnumerator CSpawnMonster(bool isBoss)
     {
         if (!IsServer) yield break;
         
@@ -19,12 +31,21 @@ public partial class Spawner
 
             for (int i = 0; i < NetworkManager.ConnectedClients.Count; i++)
             {
-                var monster = Instantiate(prefMonster);
+                Monster monster = null;
+
+                if (isBoss)
+                {
+                    monster = Instantiate(Resources.Load<Monster>("Boss/Boss"));
+                } else
+                {
+                    monster = Instantiate(prefMonster);
+                }
+
                 NetworkObject netObj = monster.GetComponent<NetworkObject>();
                 netObj.Spawn();
 
                 GameManager.Instance.AddMonster(monster);
-                BC_MonsterSpawnClientRpc(netObj.NetworkObjectId, (ulong)i);
+                BC_MonsterSpawnClientRpc(netObj.NetworkObjectId, (ulong)i, isBoss: false);
             }
         }
 

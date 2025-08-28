@@ -2134,8 +2134,6 @@ MonoBehaviour:
   Monsters: []
   MonsterCount: 0
   mUpgrade: 00000000000000000000000000000000
-  remainTime: 120
-  curWave: 1
 --- !u!4 &430092347
 Transform:
   m_ObjectHideFlags: 0
@@ -6403,7 +6401,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 125.42, y: -50}
-  m_SizeDelta: {x: 72.84, y: 151.6753}
+  m_SizeDelta: {x: 0, y: 151.6753}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1242064624
 MonoBehaviour:
