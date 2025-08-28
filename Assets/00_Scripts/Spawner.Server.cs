@@ -1,12 +1,10 @@
 using System.Collections;
-using Unity.Android.Gradle.Manifest;
 using Unity.Netcode;
-using UnityEditor.PackageManager;
 using UnityEngine;
 
 public partial class Spawner
 {
-    Coroutine cSpawnMonster;
+    public BossStat dataBoss;
 
     private void StartServer()
     {
@@ -14,28 +12,40 @@ public partial class Spawner
         StartCoroutine(CDealy(() =>
         {
             GenerateSpawnHolder();
-            cSpawnMonster = StartCoroutine(CSpawnMonster(isBoss: false));
+            StartCoroutine(CSpawnMonster());
         }, 5f));
     } 
 
-    IEnumerator CSpawnMonster(bool isBoss)
+    public IEnumerator CSpawnMonster()
     {
         if (!IsServer) yield break;
         
         // 서버에서 이미 몬스터 경로 정보 읽어서 스폰해서 클라한테 알리지만 클라는 몬스터 경로 정보 읽지 못해서 클라에서 에러나서 임시로 최초 스폰 딜레이 줌
         yield return new WaitForSeconds(3.0f);
 
-        while (true)
+        var beforeWave = GameManager.Instance.curWave;
+        while (!GameManager.Instance.inBoss)
         {
-            yield return new WaitForSeconds(MONSTER_SPAWN_INTERVAL);
-
+            var curWave = GameManager.Instance.curWave;
+            bool isChangedWave = beforeWave != curWave;
+            bool isBossWave = curWave % BOSS_WAVE == 0;
+            bool isBossSpawn = isChangedWave && isBossWave;
+            
+            if (!isBossSpawn)
+            {
+                yield return new WaitForSeconds(MONSTER_SPAWN_INTERVAL);
+            }
+            
             for (int i = 0; i < NetworkManager.ConnectedClients.Count; i++)
             {
                 Monster monster = null;
 
-                if (isBoss)
+                if (isBossSpawn)
                 {
-                    monster = Instantiate(Resources.Load<Monster>("Boss/Boss"));
+                    var bossIdx = curWave / BOSS_WAVE - 1;
+                    monster = Instantiate(dataBoss.listBossData[bossIdx].prfMonster);
+                    GameManager.Instance.inBoss = true;
+                    // GameManager.Instance.remainTime = 60;
                 } else
                 {
                     monster = Instantiate(prefMonster);
@@ -44,8 +54,13 @@ public partial class Spawner
                 NetworkObject netObj = monster.GetComponent<NetworkObject>();
                 netObj.Spawn();
 
-                GameManager.Instance.AddMonster(monster);
-                BC_MonsterSpawnClientRpc(netObj.NetworkObjectId, (ulong)i, isBoss: false);
+                GameManager.Instance.AddMonster(monster, isBossSpawn);
+                BC_MonsterSpawnClientRpc(netObj.NetworkObjectId, (ulong)i);
+            }
+
+            if(isChangedWave)
+            {
+                beforeWave = curWave;
             }
         }
 

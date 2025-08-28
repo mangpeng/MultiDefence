@@ -407,12 +407,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  MONSTER_SPAWN_INTERVAL: 10
+  MONSTER_SPAWN_INTERVAL: 1
   spawnHolder: {fileID: 620002540745997267, guid: a1745f5ead4500d4ba7a865fbcb3db72, type: 3}
   prefMonster: {fileID: 5170184945953356536, guid: 8e980e18cc3b86d41b20ac1c59a52de9, type: 3}
   myMonsterMoveList: []
   otherMonsterMoveList: []
   cnt: 0
+  dataBoss: {fileID: 11400000, guid: fd6e2237c2def964cb7555dbc9d4d347, type: 2}
 --- !u!1 &2734194174795002153
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,5 +1,7 @@
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Unity.Netcode;
 using UnityEditor.PackageManager;
 using UnityEngine;
@@ -13,7 +15,7 @@ public partial class GameManager : NetworkBehaviour
     public static GameManager Instance => Singleton<GameManager>.Instance;
 
     public event OnUpdateUIEventHandler OnUpdateUIWave;
-    public event OnUpdateUIEventHandler OnUpdateUITime;
+    public event Action<bool> OnUpdateUITime;
 
     public int Money = 50;
     public int SummonNeedMoney = 20;
@@ -22,6 +24,8 @@ public partial class GameManager : NetworkBehaviour
 
     public List<Monster> Monsters = new();
     public int MonsterCount;
+
+    public List<Monster> BossMonsters = new();
 
     public event OnMoneyEventHandler OnMoney;
 
@@ -69,27 +73,69 @@ public partial class GameManager : NetworkBehaviour
         OnMoney?.Invoke();
     }
 
-    public void AddMonster(Monster m)
+    public void AddMonster(Monster m, bool isBoss)
     {
-        Monsters.Add(m);
+        if(isBoss) 
+        {
+            BossMonsters.Add(m);
+        } 
+        else
+        {
+            Monsters.Add(m);
+        }
+            
         MonsterCount++;
-        BC_ClientMonsterCount_ClientRpc(MonsterCount); //TODO 서버에게 요청 하고 처리 하도록 변경 필요
+        BC_ClientMonsterCount_ClientRpc(MonsterCount, false); //TODO 서버에게 요청 하고 처리 하도록 변경 필요
     }
 
-    public void RemoveMonster(Monster m)
+    public void RemoveMonster(Monster m, bool isBoss)
     {
-        Monsters.Remove(m);
+        bool deadBoss = false;
+
+        if (isBoss)
+        {
+            BossMonsters.Remove(m);
+            if(BossMonsters.Count == 0)
+            {
+                inBoss = false;
+                deadBoss = true;
+
+                //
+                if (coCountDown != null)
+                {
+                    StopCoroutine(coCountDown);
+                }
+                remainTime = DEFAULT_REMAIN_TIME;
+                ++curWave;
+                coCountDown = StartCoroutine(CoCountdown());
+
+                StartCoroutine(Spawner.instance.CSpawnMonster());
+                //
+
+
+            }
+        }
+        else
+        {
+            Monsters.Remove(m);
+        }
+        
         MonsterCount--;
-        BC_ClientMonsterCount_ClientRpc(MonsterCount); //TODO 서버에게 요청 하고 처리 하도록 변경 필요
+        BC_ClientMonsterCount_ClientRpc(MonsterCount, deadBoss); //TODO 서버에게 요청 하고 처리 하도록 변경 필요
     }
 
     #region RPC
     [ClientRpc]
-    private void BC_ClientMonsterCount_ClientRpc(int count)
+    private void BC_ClientMonsterCount_ClientRpc(int count, bool isDeadBoss)
     {
         // Debug.Log($"[S->C]{nameof(BC_ClientMonsterCount_ClientRpc)}");
 
         MonsterCount = count;
+
+        if(isDeadBoss)
+        {
+            UIMain.Instance.objBossWaveCount.gameObject.SetActive(false);
+        }
     }
 
     [ClientRpc]
@@ -100,12 +146,21 @@ public partial class GameManager : NetworkBehaviour
         this.remainTime = remainTime;
         this.curWave = curWave;
 
-        OnUpdateUIWave?.Invoke();
-        OnUpdateUITime?.Invoke();
+        string bossName = string.Empty;
+        bool isBossWave = curWave % Spawner.BOSS_WAVE == 0;
 
-        if(changedWave)
+        OnUpdateUIWave?.Invoke();
+        OnUpdateUITime?.Invoke(isBossWave);
+        
+        if (changedWave)
         {
-            UIMain.Instance.OnWavePopup(curWave);
+            if (isBossWave)
+            {
+                var bossIdx = curWave / Spawner.BOSS_WAVE - 1;
+                bossName = Spawner.instance.dataBoss.listBossData[bossIdx].bossName;
+            }
+
+            UIMain.Instance.OnWavePopup(curWave, bossName);
         }
     }
     #endregion

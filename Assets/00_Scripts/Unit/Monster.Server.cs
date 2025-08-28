@@ -26,7 +26,7 @@ public partial class Monster
             // 서버에서 삭제
             // 주의! 서버에서 미리 삭제하면 ClientRpc는 작동 안함
             //NetworkObject.Despawn(false);
-            GameManager.Instance.RemoveMonster(this);
+            GameManager.Instance.RemoveMonster(this, isBoss);
             StartCoroutine(CoDespawnAfter(1.0f));
         }
         else

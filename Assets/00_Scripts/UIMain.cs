@@ -6,6 +6,7 @@ using TMPro;
 using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.UI;
+using WebSocketSharp;
 
 public class UIMain : Singleton<UIMain>
 {
@@ -39,6 +40,9 @@ public class UIMain : Singleton<UIMain>
     [Header("##Others")]
     [SerializeField] private GameObject popUpWave;
     [SerializeField] private TextMeshProUGUI popUpWavetxt;
+    [SerializeField] private TextMeshProUGUI popUpWaveBossName;
+    [SerializeField] public GameObject objBossWaveCount;
+    [SerializeField] private TextMeshProUGUI objBossWaveCountTimer;
 
     private List<TextMeshProUGUI> listNaviTxt = new();
 
@@ -76,10 +80,20 @@ public class UIMain : Singleton<UIMain>
     
     #region UI
 
-    public void OnWavePopup(int wave)
+    public void OnWavePopup(int wave, string bossName)
     {
         popUpWave.gameObject.SetActive(true);
         popUpWavetxt.text = $"WAVE {wave:D2}";
+
+        if (!bossName.IsNullOrEmpty())
+        {
+            popUpWaveBossName.text = bossName;
+         
+            var anim = popUpWave.GetComponent<Animator>();
+            anim.SetTrigger("Boss");
+
+            objBossWaveCount.gameObject.SetActive(true);
+        }
     }
 
     public void OnUpgrade(int idx)
@@ -190,11 +204,20 @@ public class UIMain : Singleton<UIMain>
         txtWave.text = $"WAVE{GameManager.Instance.curWave:D2}";  
     }
 
-    private void UpdateUITime()
+    private void UpdateUITime(bool isBoss)
     {
-        int minutes = GameManager.Instance.remainTime / 60;
-        int seconds = GameManager.Instance.remainTime % 60;
-        txtTime.text = $"{minutes:D2}:{seconds:D2}";
+        if(isBoss)
+        {
+            int minutes = GameManager.Instance.remainTime / 60;
+            int seconds = GameManager.Instance.remainTime % 60;
+            objBossWaveCountTimer.text = $"{minutes:D2}:{seconds:D2}";
+            txtTime.text = "In Boss";
+        } else
+        {
+            int minutes = GameManager.Instance.remainTime / 60;
+            int seconds = GameManager.Instance.remainTime % 60;
+            txtTime.text = $"{minutes:D2}:{seconds:D2}";
+        }
     }
 
     #endregion

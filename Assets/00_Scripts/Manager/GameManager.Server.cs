@@ -5,15 +5,18 @@ using UnityEngine.UI;
 
 public partial class GameManager
 {
-    private const int DEFAULT_REMAIN_TIME = 30;
+    private const int DEFAULT_REMAIN_TIME = 10;
     [System.NonSerialized] public int remainTime = DEFAULT_REMAIN_TIME;
     [System.NonSerialized] public int curWave = 1;
 
     private int beforeWave = 1;
 
+    public bool inBoss = false;
+    public Coroutine coCountDown;
+
     private void StartServer()
     {
-        StartCoroutine(CoCountdown());
+        coCountDown = StartCoroutine(CoCountdown());
     }
 
     private void UpdateServer()
@@ -22,7 +25,17 @@ public partial class GameManager
     }
 
     IEnumerator CoCountdown()
-    {        
+    {
+        bool isBossWave = curWave % 5 == 0;
+        if (isBossWave)
+        {
+            remainTime = 60;
+        }
+        else
+        {
+            remainTime = DEFAULT_REMAIN_TIME;
+        }
+
         while (remainTime > 0)
         {
             Debug.Log(remainTime);
@@ -33,11 +46,10 @@ public partial class GameManager
             yield return new WaitForSeconds(1); // timeScale 영향 받음
             remainTime--;            
         }
-
-        remainTime = DEFAULT_REMAIN_TIME;
+                    
         ++curWave;
 
-        StartCoroutine(CoCountdown());
+        coCountDown = StartCoroutine(CoCountdown());
     }
 
     #region RPC

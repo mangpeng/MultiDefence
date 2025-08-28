@@ -23,6 +23,8 @@ public partial class Spawner : NetworkBehaviour
     private const int GRID_X_COUNT = 6;
     private const int GRID_Y_COUNT = 3;
 
+    public const int BOSS_WAVE = 5;
+
     [Header("Variables")]
     [SerializeField] private float MONSTER_SPAWN_INTERVAL = 1.0f;
 
@@ -173,7 +175,7 @@ public partial class Spawner : NetworkBehaviour
     }
 
     [ClientRpc]
-    private void BC_MonsterSpawnClientRpc(ulong netObjId, ulong clientid, bool isBoss = false)
+    private void BC_MonsterSpawnClientRpc(ulong netObjId, ulong clientid)
     {
         // Debug.Log($"[S->C]{nameof(BC_MonsterSpawnClientRpc)}");
 
