@@ -23,8 +23,12 @@ public partial class Monster : Character
     private Vector2 curTarget;
 
     private bool isDead = false;
+    private bool isStun = false;
     List<Vector2> moveList = new();
     public int HP = 0, MaxHP = 100;
+
+    [Header("Effects")]
+    [SerializeField] private GameObject prfStun;
 
     protected void Start()
     {
@@ -57,6 +61,7 @@ public partial class Monster : Character
         imgHp2.fillAmount = Mathf.Lerp(imgHp2.fillAmount, imgHp.fillAmount, Time.deltaTime * 2.0f);
 
         if (isDead) return;
+        if (isStun) return;
 
         // Move
         if (moveList.Count == 0)
@@ -167,15 +172,60 @@ public partial class Monster : Character
             yield return null;
         }
     }
-    public void Slow(float slowAmount, float slowDuration)
+
+    private IEnumerator CoDebuff(Action before, Action after, float duration)
     {
-        if (mCoSlow != null)
+        before?.Invoke();
+        yield return new WaitForSeconds(duration);
+        after?.Invoke();
+    }
+
+    public void Slow(float amount, float duration)
+    {
+        var co = mCoDebuff[(int)Debuff.Slow];
+        if (co != null)
         {
             return;
-            // StopCoroutine(mCoSlow);
         }
 
-        mCoSlow = StartCoroutine(CoSlow(slowAmount, slowDuration));
+        co = StartCoroutine(CoDebuff(
+            ()=>
+            {
+                sprRr.color = Color.blue;
+                var newSpeed = mSpeed - (mSpeed * amount);
+                newSpeed = Mathf.Max(newSpeed, 0.1f);
+                mSpeed = newSpeed;
+            }, 
+            ()=>
+            {
+                sprRr.color = Color.white;
+                mSpeed = MOVE_SPEED;
+                co = null;
+            },
+            duration));
+    }
+
+    public void Stun(float duration)
+    {
+        var co = mCoDebuff[(int)Debuff.Stun];
+        if (co != null)
+        {
+            return;
+        }
+
+        co = StartCoroutine(CoDebuff(
+            () =>
+            {
+                isStun = true;
+                prfStun.gameObject.SetActive(true);
+            },
+            () =>
+            {
+                isStun = false;
+                prfStun.gameObject.SetActive(false);
+                co = null;
+            },
+            duration));
     }
 
     #region RPC
@@ -195,9 +245,34 @@ public partial class Monster : Character
     }
 
     [ClientRpc]
-    public void BC_Slow_ClientRpc(float slowAmount, float slowDuration)
+    public void BC_Debuff_ClientRpc(Debuff type, float[] values)
     {
-        Slow(slowAmount, slowDuration);
+        switch(type)
+        {
+            case Debuff.Slow:
+                {
+                    if(values.Length !=  2)
+                    {
+                        Debug.LogWarning("Not invalid params");
+                        return;
+                    }
+                    var slowAmount = (float)values[0];
+                    var slowDuration = (float)values[1];
+                    Slow(slowAmount, slowDuration);
+                    break;
+                }
+            case Debuff.Stun:
+                {
+                    if (values.Length != 1)
+                    {
+                        Debug.LogWarning("Not invalid params");
+                        return;
+                    }
+                    var stunDuration = (float)values[0];
+                    Stun(stunDuration);
+                    break;
+                }
+        }
     }
 
     [ClientRpc]

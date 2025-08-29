@@ -35,6 +35,9 @@ public class Hero : Character
     public Color[] circleColor;
     public SpriteRenderer circleSrr;
 
+    public float mStunChacne = 0.1f;
+    public float mStunDuration = 1.0f;
+
     public float mSlowChacne = 0.3f;
     public float mSlowAmount = 0.3f;
     public float mSlowDuration = 2.0f;
@@ -212,10 +215,17 @@ public class Hero : Character
 
             monster.GetDamage(ATK);
 
-            bool isSlow = Random.value < mSlowChacne;
-            if(isSlow)
+            bool isStun = Random.value < mStunChacne;
+            if (isStun)
             {
-                monster.BC_Slow_ClientRpc(mSlowAmount, mSlowDuration);
+                monster.BC_Debuff_ClientRpc(Debuff.Stun, new float[] { mStunDuration });
+            } else
+            {
+                bool isSlow = Random.value < mSlowChacne;
+                if (isSlow)
+                {
+                    monster.BC_Debuff_ClientRpc(Debuff.Slow, new float[] { mSlowAmount, mSlowDuration });
+                }
             }
         }
     }
