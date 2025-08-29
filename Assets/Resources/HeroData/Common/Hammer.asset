@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 642dada0d36758a49b75f63f4a8f3b36, type: 3}
+  m_Name: Hammer
+  m_EditorClassIdentifier: 
+  Name: Hammer
+  ATK: 20
+  ATK_Speed: 0.5
+  Range: 1.5
+  animatorController: {fileID: 9100000, guid: 732f25f3ae448f04f904a6f7175d4b95, type: 2}
+  rarity: 0
+  prfBullet: {fileID: 6475809492453754260, guid: 75987cc3448715541aca25c811c4f6a0, type: 3}
+  debuffs: []
