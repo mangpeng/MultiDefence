@@ -13,9 +13,15 @@ MonoBehaviour:
   m_Name: Archer
   m_EditorClassIdentifier: 
   Name: Archer
-  ATK: 5
-  ATK_Speed: 2
+  ATK: 1
+  ATK_Speed: 10
   Range: 1
   animatorController: {fileID: 9100000, guid: b15421697b5fc49469f1a12d6f9debb1, type: 2}
   rarity: 0
   prfBullet: {fileID: 8937217233303440734, guid: 46d14921287c7834c9c7361e541f1f3d, type: 3}
+  debuffs:
+  - type: 0
+    values:
+    - 0.5
+    - 2
+    - 0.5

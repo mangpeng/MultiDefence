@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 public partial class Monster
 {
-    private Coroutine[] mCoDebuff = new Coroutine[(int)Debuff.Size];
+    private Coroutine[] mCoDebuff = new Coroutine[Enum.GetValues(typeof(Debuff)).Length];
 
     public void GetDamage(int dmg)
     {

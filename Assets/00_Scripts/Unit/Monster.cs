@@ -256,8 +256,10 @@ public partial class Monster : Character
                         Debug.LogWarning("Not invalid params");
                         return;
                     }
-                    var slowAmount = (float)values[0];
-                    var slowDuration = (float)values[1];
+
+                    var slowDuration = values[0];
+                    var slowAmount = values[1];
+
                     Slow(slowAmount, slowDuration);
                     break;
                 }
@@ -268,7 +270,7 @@ public partial class Monster : Character
                         Debug.LogWarning("Not invalid params");
                         return;
                     }
-                    var stunDuration = (float)values[0];
+                    var stunDuration = values[0];
                     Stun(stunDuration);
                     break;
                 }

@@ -1,4 +1,5 @@
 using IGN.Common.Actions;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +7,7 @@ using Unity.Netcode;
 using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.InputSystem.Switch;
+using static Unity.VisualScripting.Member;
 
 public class Hero : Character
 {
@@ -34,13 +36,6 @@ public class Hero : Character
 
     public Color[] circleColor;
     public SpriteRenderer circleSrr;
-
-    public float mStunChacne = 0.1f;
-    public float mStunDuration = 1.0f;
-
-    public float mSlowChacne = 0.3f;
-    public float mSlowAmount = 0.3f;
-    public float mSlowDuration = 2.0f;
 
     private int UpgradeIndex()
     {
@@ -214,17 +209,16 @@ public class Hero : Character
                 return;
 
             monster.GetDamage(ATK);
+            foreach (var debuff in m_Data.debuffs ?? Enumerable.Empty<SkillDebuff>())
+            {
+                var chance = debuff.values[0];
+                Debug.Log(chance);
+                var landed = UnityEngine.Random.value < chance;
 
-            bool isStun = Random.value < mStunChacne;
-            if (isStun)
-            {
-                monster.BC_Debuff_ClientRpc(Debuff.Stun, new float[] { mStunDuration });
-            } else
-            {
-                bool isSlow = Random.value < mSlowChacne;
-                if (isSlow)
+                if(landed)
                 {
-                    monster.BC_Debuff_ClientRpc(Debuff.Slow, new float[] { mSlowAmount, mSlowDuration });
+                    float[] values = debuff.values.Skip(1).ToArray();
+                    monster.BC_Debuff_ClientRpc(debuff.type, values);
                 }
             }
         }
