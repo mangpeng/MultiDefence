@@ -98,15 +98,11 @@ public partial class Spawner : NetworkBehaviour
                 {
                     mySpawnList.Add(new Vector2(posX, posY + tr.position.y - gridHeight));
                     mySpawnedList.Add(false);
-                    Debug.Log($"mylistSize: {mySpawnList.Count} {mySpawnedList.Count}");
-                    // C2S_SpawnHeroHolder_ServerRpc(UtilManager.LocalID);
-
                 }
                 else
                 {
                     otherSpawnList.Add(new Vector2(posX, posY + tr.position.y));
-                    otherSpawnedList.Add(false);
-                    Debug.Log($"mylistSize: {otherSpawnList.Count} {otherSpawnedList.Count}");
+                    otherSpawnedList.Add(false);                    
                 }
 
                 
@@ -211,16 +207,9 @@ public partial class Spawner : NetworkBehaviour
             holder.clientId = clientId;
             dicHolder[clientId].Add(holder);
 
-            Debug.LogWarning($"idx {idx}");
             var list1 = isPlayer ? mySpawnList : otherSpawnList;
             var list2 = isPlayer ? mySpawnedList : otherSpawnedList;
-            Debug.LogWarning($"idx {idx} {list1.Count} {list1.Count}");
-            SetPositionHeroHolder(holder,
-                list1,
-                list2);
-
-
-            Debug.LogWarning($"IsPlayer{isPlayer} clientId: {clientId}, dic ªÁ¿Ã¡Ó: {dicHolder[clientId].Count}");
+            SetPositionHeroHolder(holder, list1, list2);
         }
     }
 

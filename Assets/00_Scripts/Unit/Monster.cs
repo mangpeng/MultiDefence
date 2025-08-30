@@ -136,7 +136,7 @@ public partial class Monster : Character
         }
 
         this.curTarget = target;
-        sprRr.flipX = targetIdx == 3 || targetIdx == 0; 
+        m_sprRr.flipX = targetIdx == 3 || targetIdx == 0; 
     }
 
     private int GetNextTargetIndex()
@@ -161,13 +161,13 @@ public partial class Monster : Character
     {
         imgHp.transform.parent.gameObject.SetActive(false);
         float alpha = 1.0f;
-        while(sprRr.color.a > 0.0f)
+        while(m_sprRr.color.a > 0.0f)
         {
             alpha -= Time.deltaTime;
-            var color = sprRr.color;
+            var color = m_sprRr.color;
             color.a = alpha;
 
-            sprRr.color = color;
+            m_sprRr.color = color;
 
             yield return null;
         }
@@ -191,14 +191,14 @@ public partial class Monster : Character
         co = StartCoroutine(CoDebuff(
             ()=>
             {
-                sprRr.color = Color.blue;
+                m_sprRr.color = Color.blue;
                 var newSpeed = mSpeed - (mSpeed * amount);
                 newSpeed = Mathf.Max(newSpeed, 0.1f);
                 mSpeed = newSpeed;
             }, 
             ()=>
             {
-                sprRr.color = Color.white;
+                m_sprRr.color = Color.white;
                 mSpeed = MOVE_SPEED;
                 co = null;
             },

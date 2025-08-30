@@ -22,7 +22,8 @@ public class Hero : Character
     }
 
     [SerializeField] private float attackRange = 1.0f;
-    private float attackSpeed = 0.0f;
+    public float m_attackInterval = 0.0f;
+    public float m_attackSpeed = 1.0f;
 
     public Transform attackTarget = null;
     private LayerMask enemyLayer;
@@ -36,6 +37,8 @@ public class Hero : Character
 
     public Color[] circleColor;
     public SpriteRenderer circleSrr;
+    
+    private Coroutine m_coChangeSpeed;
 
     private int UpgradeIndex()
     {
@@ -60,7 +63,7 @@ public class Hero : Character
 
         attackRange = data.heroRange;
         ATK = data.heroAtk;
-        attackSpeed = data.heroAtk_speed;
+        m_attackInterval = data.heroAtk_speed;
         parentHolder = holder;
         circleSrr.color = circleColor[(int)data.heroRarity]; 
         GetInitCharacter(data.heroName, rarity);
@@ -69,7 +72,7 @@ public class Hero : Character
 
         if (rarity == "Uncommon")
         {
-            sprRr.color = Color.red;
+            m_sprRr.color = Color.red;
         }
     }
 
@@ -96,8 +99,8 @@ public class Hero : Character
         int sign = (int)Mathf.Sign(poss[myIdx].x - transform.position.x);
         switch (sign)
         {
-            case -1: sprRr.flipX = true; break;
-            case 1: sprRr.flipX = false; break;
+            case -1: m_sprRr.flipX = true; break;
+            case 1: m_sprRr.flipX = false; break;
         }
 
         StartCoroutine(CMove(poss[myIdx]));
@@ -122,7 +125,7 @@ public class Hero : Character
 
         isMove = false;
         AnimChange("IDLE", false);
-        sprRr.flipX = true;
+        m_sprRr.flipX = true;
     }
 
     private void Update()
@@ -151,15 +154,15 @@ public class Hero : Character
             attackTarget = closestEnemy.transform;
         }
 
-        attackSpeed += Time.deltaTime;
+        m_attackInterval += Time.deltaTime * m_attackSpeed;
         if(attackTarget)
         {
-            if(attackSpeed >= 1.0f)
+            if(m_attackInterval >= 1.0f)
             {
-                attackSpeed = 0.0f;
+                m_attackInterval = 0.0f;
                 AnimChange("ATTACK", true);
+                m_anim.speed = m_attackSpeed;
                 GetBullet();
-                // CS_AttackMonsterServerRpc(attackTarget.GetComponent<NetworkObject>().NetworkObjectId);
             }
         }
     }
@@ -196,6 +199,22 @@ public class Hero : Character
         }
 
         CS_AttackMonsterServerRpc(attackTarget.GetComponent<NetworkObject>().NetworkObjectId);
+    }
+
+    public void ChangeAttackSpeed(float duration, float afterValue)
+    {
+        if(m_coChangeSpeed != null)
+        {
+            StopCoroutine(m_coChangeSpeed);
+        }
+
+        m_coChangeSpeed = StartCoroutine(CoChangeSpeed(duration, afterValue));
+    }
+    private IEnumerator CoChangeSpeed(float duration, float aftervalue)
+    {
+        yield return new WaitForSeconds(duration);
+        m_attackSpeed = aftervalue;
+        m_anim.speed = aftervalue;
     }
 
     #region Network

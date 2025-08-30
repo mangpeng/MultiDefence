@@ -3,30 +3,35 @@ using UnityEngine;
 
 public class Character : NetworkBehaviour
 {
-    protected Animator anim;
-    protected SpriteRenderer sprRr;
+    protected Animator m_anim;
+    protected SpriteRenderer m_sprRr;
 
     protected virtual void Awake()
     {
-        anim = transform.GetChild(0).GetComponent<Animator>();
-        sprRr = transform.GetChild(0).GetComponent<SpriteRenderer>();
+        m_anim = transform.GetChild(0).GetComponent<Animator>();
+        m_sprRr = transform.GetChild(0).GetComponent<SpriteRenderer>();
     }
 
     public void GetInitCharacter(string heroeName, string rarity)
     {
-        anim.runtimeAnimatorController = Resources.Load<HeroStat>($"HeroData/{rarity}/{heroeName}").animatorController;
+        m_anim.runtimeAnimatorController = Resources.Load<HeroStat>($"HeroData/{rarity}/{heroeName}").animatorController;
     }
 
     protected void AnimChange(string temp, bool trigger)
-    {
+    {        
+        if(temp != "ATTACK")
+        {
+            m_anim.speed = 1.0f;
+        }
+
         if (trigger)
         {
-            anim.SetTrigger(temp);
+            m_anim.SetTrigger(temp);
             return;
         }
 
-        anim.SetBool("IDLE", false);
-        anim.SetBool("MOVE", false);
-        anim.SetBool(temp, true);
+        m_anim.SetBool("IDLE", false);
+        m_anim.SetBool("MOVE", false);
+        m_anim.SetBool(temp, true);
     }
 }

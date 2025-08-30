@@ -1,7 +1,8 @@
 public enum eSkill
 {
     None,
-    Gun
+    Gun,
+    Shield,
 }
 
 public enum Debuff

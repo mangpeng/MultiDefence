@@ -2,6 +2,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using Unity.Netcode;
 using UnityEditor.PackageManager;
 using UnityEngine;
@@ -136,6 +137,28 @@ public partial class GameManager : NetworkBehaviour
             if (dist <= radius)
             {
                 result.Add(monster);
+            }
+        }
+
+        return result;
+    }
+
+    public List<Hero> FindHeros(Vector3 worldCenterPos, float radius)
+    {
+        List<Hero> result = new List<Hero>();
+
+        foreach (var (clientId, holders) in Spawner.instance.dicHolder)
+        {
+            foreach (var holder in holders)
+            {
+                foreach (var hero in holder.Heros)
+                {
+                    float dist = Vector3.Distance(worldCenterPos, hero.transform.position);
+                    if (dist <= radius)
+                    {
+                        result.Add(hero);
+                    }
+                }
             }
         }
 

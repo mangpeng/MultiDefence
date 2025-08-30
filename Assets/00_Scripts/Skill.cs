@@ -46,8 +46,6 @@ public class Skill : MonoBehaviour
             mCoolTimeFill.transform.parent.gameObject.SetActive(true);
             StartCoroutine(CoSkillDealy());
         } 
-
-
     }
 
     private void Update()
@@ -80,6 +78,7 @@ public class Skill : MonoBehaviour
         switch (type)
         {
             case eSkill.Gun: return () => Gun();
+            case eSkill.Shield: return () => Shield();
             default: return null;
         }
     }
@@ -96,6 +95,25 @@ public class Skill : MonoBehaviour
         {
             monster.C2S_Debuff_ServerRpc(Debuff.Stun, new float[]{ 1.0f });
             monster.GetDamage(Damage);
+        }
+    }
+
+    //fixme 서버에서 판정하고 내려 주는 형태로 바꿔야 함
+    private void Shield()
+    {
+        
+        var effect = mHero.m_Data.activeSkill.mParticle;
+
+        var overlappedHeros = GameManager.Instance.FindHeros(transform.position, radius: 3.0f);
+        foreach (var hero in overlappedHeros)
+        {
+            var pos = hero.transform.position;
+            Instantiate(effect, pos, Quaternion.identity);
+
+            var addSpeedRatio = mSkillData.mSkillDamage;
+            var skillDuration = 3.0f;
+            hero.m_attackSpeed *= addSpeedRatio / 100.0f;
+            hero.ChangeAttackSpeed(skillDuration, 1.0f);
         }
     }
 }

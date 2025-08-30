@@ -302,7 +302,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 673542684
+  GlobalObjectIdHash: 1076185813
   InScenePlacedSourceGlobalObjectIdHash: 673542684
   DeferredDespawnTick: 0
   Ownership: 1
@@ -329,6 +329,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   attackRange: 1
+  m_attackInterval: 0
+  m_attackSpeed: 1
+  attackTarget: {fileID: 0}
   m_Data: {fileID: 11400000, guid: ce73efdb5373f7943b52f7f3015a7ecd, type: 2}
   parentHolder: {fileID: 0}
   prfSpawnEffect: {fileID: 1361071568481113373, guid: ef5774f5afe6e5d45aa13fe8ca2c6ea5, type: 3}
@@ -537,7 +540,7 @@ Animator:
   m_GameObject: {fileID: 7768502156930139057}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: c1a836430fba3f241a4aa25dea14a035, type: 2}
+  m_Controller: {fileID: 9100000, guid: 269fc748915496242adfba8d7e674cc0, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
