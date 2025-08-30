@@ -65,6 +65,7 @@ public partial class Spawner
         }
 
     }
+
     private void HeroSpawn(ulong clientid, string holderName, string rarity, HeroStatData data)
     {
         if (!IsServer)

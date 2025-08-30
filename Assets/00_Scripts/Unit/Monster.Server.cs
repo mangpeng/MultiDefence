@@ -38,5 +38,10 @@ public partial class Monster
     }
 
     #region RPC
+    [ServerRpc(RequireOwnership = false)]
+    public void C2S_Debuff_ServerRpc(Debuff type, float[] values)
+    {
+        BC_Debuff_ClientRpc(type, values);
+    }
     #endregion
 }

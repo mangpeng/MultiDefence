@@ -1,3 +1,9 @@
+public enum eSkill
+{
+    None,
+    Gun
+}
+
 public enum Debuff
 {
     Slow = 0,

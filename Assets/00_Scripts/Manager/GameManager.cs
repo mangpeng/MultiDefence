@@ -124,6 +124,24 @@ public partial class GameManager : NetworkBehaviour
         BC_ClientMonsterCount_ClientRpc(MonsterCount, deadBoss); //TODO 서버에게 요청 하고 처리 하도록 변경 필요
     }
 
+    public List<Monster> FindMonsters(Vector3 worldCenterPos, float radius)
+    {
+        List<Monster> result = new List<Monster>();
+
+        foreach (var monster in Monsters)
+        {
+            if (monster == null) continue;
+
+            float dist = Vector3.Distance(worldCenterPos, monster.transform.position);
+            if (dist <= radius)
+            {
+                result.Add(monster);
+            }
+        }
+
+        return result;
+    }
+
     #region RPC
     [ClientRpc]
     private void BC_ClientMonsterCount_ClientRpc(int count, bool isDeadBoss)

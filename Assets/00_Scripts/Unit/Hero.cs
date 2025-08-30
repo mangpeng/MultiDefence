@@ -24,7 +24,7 @@ public class Hero : Character
     [SerializeField] private float attackRange = 1.0f;
     private float attackSpeed = 0.0f;
 
-    private Transform attackTarget = null;
+    public Transform attackTarget = null;
     private LayerMask enemyLayer;
     public HeroStat m_Data;
 
@@ -212,9 +212,7 @@ public class Hero : Character
             foreach (var debuff in m_Data.debuffs ?? Enumerable.Empty<SkillDebuff>())
             {
                 var chance = debuff.values[0];
-                Debug.Log(chance);
                 var landed = UnityEngine.Random.value < chance;
-
                 if(landed)
                 {
                     float[] values = debuff.values.Skip(1).ToArray();

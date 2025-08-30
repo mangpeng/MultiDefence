@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 642dada0d36758a49b75f63f4a8f3b36, type: 3}
-  m_Name: Wizard 1
+  m_Name: Gun
   m_EditorClassIdentifier: 
   Name: Gun
   ATK: 5
@@ -20,3 +20,8 @@ MonoBehaviour:
   rarity: 0
   prfBullet: {fileID: 6475809492453754260, guid: 75987cc3448715541aca25c811c4f6a0, type: 3}
   debuffs: []
+  activeSkill:
+    type: 1
+    mCoolTime: 10
+    mSkillDamage: 1000
+    mParticle: {fileID: 671595906457607231, guid: cd0c6fb669006d144bc95afcb50baf60, type: 3}

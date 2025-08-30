@@ -108,6 +108,7 @@ public class HeroEditor : Editor
         EditorGUILayout.PropertyField(serializedObject.FindProperty("animatorController"));
         EditorGUILayout.PropertyField(serializedObject.FindProperty("rarity"));
         EditorGUILayout.PropertyField(serializedObject.FindProperty("prfBullet"));
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("activeSkill"));
 
         EditorGUILayout.Space(20);
 

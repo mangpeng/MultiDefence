@@ -38,7 +38,6 @@ public partial class GameManager
 
         while (remainTime > 0)
         {
-            Debug.Log(remainTime);
             bool changedWave = beforeWave != curWave;
             beforeWave = curWave;
             BC_UpdateTime_ClientRpc(remainTime, curWave, changedWave);

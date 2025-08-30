@@ -3,6 +3,15 @@ using Unity.Netcode;
 using UnityEngine;
 
 [System.Serializable]
+public class SkillActive
+{
+    public eSkill type;
+    public float mCoolTime;
+    public float mSkillDamage;
+    public GameObject mParticle;
+}
+
+[System.Serializable]
 public class SkillDebuff
 {
     public Debuff type;
@@ -38,8 +47,12 @@ public class HeroStat : ScriptableObject
     public Bullet prfBullet;
     
     [Space(20)]
-    [Header("Skill")]
+    [Header("Skill-Debuff")]
     public SkillDebuff[] debuffs;
+
+    [Space(20)]
+    [Header("Skill-Active")]
+    public SkillActive activeSkill;
 
     public HeroStatData GetData()
     {
@@ -55,7 +68,6 @@ public class HeroStat : ScriptableObject
 
 
 }
-
 
 [System.Serializable]
 public struct HeroStatData : INetworkSerializable
