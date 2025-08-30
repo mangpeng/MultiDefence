@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using RpcDebug;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,6 +7,7 @@ using System.Runtime.CompilerServices;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.GraphicsBuffer;
 
 public partial class Monster : Character
 {
@@ -242,6 +244,14 @@ public partial class Monster : Character
         imgHp.fillAmount = (float)HP / MaxHP;
 
         Instantiate(txtHit, transform.position, Quaternion.identity).Initialize(dmg);
+
+        RpcLogger.Log(
+            kind: RpcKind.ClientRpc,
+            dir: RpcDirection.ServerToClient,
+            method: nameof(BC_Hit_ClientRpc),
+            senderClientId: NetworkManager.Singleton.LocalClientId, // 서버에서 호출 시 보통 Host=0            
+            payloadSummary: $"hp={hp}, dmg={dmg}"
+        );
     }
 
     [ClientRpc]

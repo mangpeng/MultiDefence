@@ -1,13 +1,11 @@
 using IGN.Common.Actions;
-using System;
+using RpcDebug;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
-using UnityEditor.Rendering;
 using UnityEngine;
-using UnityEngine.InputSystem.Switch;
-using static Unity.VisualScripting.Member;
+using UnityEngine.Diagnostics;
 
 public class Hero : Character
 {
@@ -221,6 +219,14 @@ public class Hero : Character
     [ServerRpc(RequireOwnership = false)]
     public void CS_AttackMonsterServerRpc(ulong targetId)
     {
+        RpcLogger.Log(
+            kind: RpcKind.ServerRpc,
+            dir: RpcDirection.ClientToServer,
+            method: nameof(CS_AttackMonsterServerRpc),
+            senderClientId: UtilManager.LocalID,
+            payloadSummary: $"target={targetId}"
+        );
+
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(targetId, out var netObj))
         {
             var monster = netObj.GetComponent<Monster>();
