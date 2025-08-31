@@ -1,4 +1,4 @@
-# feat: add hammer hero skill
+feat: add hammer hero skill
 
 # <type>: <subject>
 # subject는 명령형 현재 시제로, 50자 이내로 작성
