@@ -13,9 +13,17 @@ MonoBehaviour:
   m_Name: Wizard(Uncommon)
   m_EditorClassIdentifier: 
   Name: Wizard(Uncommon)
+  IconName: Wizard_Uncommon
+  Description: 
   ATK: 20
   ATK_Speed: 0.5
   Range: 15
   animatorController: {fileID: 9100000, guid: 2d6f998e3dc9b6549a9b522b35810935, type: 2}
   rarity: 1
   prfBullet: {fileID: 8937217233303440734, guid: 46d14921287c7834c9c7361e541f1f3d, type: 3}
+  debuffs: []
+  activeSkill:
+    type: 0
+    mCoolTime: 0
+    mSkillDamage: 0
+    mParticle: {fileID: 0}

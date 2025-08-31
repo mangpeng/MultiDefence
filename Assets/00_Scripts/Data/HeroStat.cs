@@ -39,6 +39,8 @@ public class SkillDebuff
 public class HeroStat : ScriptableObject
 {
     public string Name;
+    public string IconName;
+    [TextArea] public string Description;
     public int ATK;
     public float ATK_Speed;
     public float Range;

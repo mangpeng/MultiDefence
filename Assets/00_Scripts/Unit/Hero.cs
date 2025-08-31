@@ -3,6 +3,7 @@ using RpcDebug;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Diagnostics;
@@ -219,13 +220,7 @@ public class Hero : Character
     [ServerRpc(RequireOwnership = false)]
     public void CS_AttackMonsterServerRpc(ulong targetId)
     {
-        RpcLogger.Log(
-            kind: RpcKind.ServerRpc,
-            dir: RpcDirection.ClientToServer,
-            method: nameof(CS_AttackMonsterServerRpc),
-            senderClientId: UtilManager.LocalID,
-            payloadSummary: $"target={targetId}"
-        );
+        RpcLogger.LogRpc(MethodBase.GetCurrentMethod(), $"target={targetId}");
 
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(targetId, out var netObj))
         {

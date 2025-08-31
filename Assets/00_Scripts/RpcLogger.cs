@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Reflection;
+using Unity.Netcode;
 using UnityEngine;
+using System.Linq;
 
 namespace RpcDebug
 {
@@ -54,6 +57,34 @@ namespace RpcDebug
             while (_queue.Count > historyLimit && _queue.TryDequeue(out _)) { }
         }
 
+        public static void LogRpc(MethodBase method, string payloadSummary = "")
+        {
+            RpcKind kind = RpcKind.ServerRpc;
+            RpcDirection dir= RpcDirection.ClientToServer;
+            ulong senderId = 0;
+
+            var methodInfo = method as MethodInfo;
+            if (methodInfo == null) return;
+
+            var hasServerRpc = Attribute.IsDefined(methodInfo, typeof(ServerRpcAttribute));
+            var hasClientRpc = Attribute.IsDefined(methodInfo, typeof(ClientRpcAttribute));
+
+            if (hasServerRpc)
+            {
+                kind = RpcKind.ServerRpc;
+                dir = RpcDirection.ClientToServer;
+                senderId = NetworkManager.Singleton.LocalClientId; // or ServerRpcParams
+            }
+            else if (hasClientRpc)
+            {
+                kind = RpcKind.ClientRpc;
+                dir = RpcDirection.ServerToClient;
+                senderId = NetworkManager.Singleton.LocalClientId;
+            }
+
+            RpcLogger.Log(kind, dir, method.Name, senderId, payloadSummary: payloadSummary);
+        }
+
         /// <summary>Move queue → buffer. Call from editor update/OnGUI.</summary>
         public static void Flush(int maxBuffer = 4000, int keepAfterTrim = 3000)
         {
@@ -76,4 +107,6 @@ namespace RpcDebug
         }
 #endif
     }
+
+
 }

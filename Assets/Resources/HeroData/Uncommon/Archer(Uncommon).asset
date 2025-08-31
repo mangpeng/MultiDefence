@@ -13,9 +13,17 @@ MonoBehaviour:
   m_Name: Archer(Uncommon)
   m_EditorClassIdentifier: 
   Name: Archer(Uncommon)
+  IconName: Archer_Uncommon
+  Description: 
   ATK: 20
   ATK_Speed: 0.5
   Range: 15
   animatorController: {fileID: 9100000, guid: b15421697b5fc49469f1a12d6f9debb1, type: 2}
   rarity: 1
   prfBullet: {fileID: 8937217233303440734, guid: 46d14921287c7834c9c7361e541f1f3d, type: 3}
+  debuffs: []
+  activeSkill:
+    type: 0
+    mCoolTime: 0
+    mSkillDamage: 0
+    mParticle: {fileID: 0}

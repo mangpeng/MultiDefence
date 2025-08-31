@@ -1,7 +1,9 @@
+using RpcDebug;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using Unity.Netcode;
 using Unity.VisualScripting;
@@ -58,8 +60,7 @@ public partial class Spawner : NetworkBehaviour
         action?.Invoke();
     }
     private void SetGrid()
-    {
-        Debug.Log($"SetGrid {UtilManager.LocalID}");
+    {        
         GridStart(transform.GetChild(0), isPlayer: true);
         GridStart(transform.GetChild(1), isPlayer: false);
 
@@ -165,19 +166,19 @@ public partial class Spawner : NetworkBehaviour
     [ClientRpc]
     private void BC_GetPosition_ClientRpc(ulong clientId, int h1, int h2)
     {
-        Debug.Log($"[S->C]{nameof(BC_GetPosition_ClientRpc)}");
+        RpcLogger.LogRpc(MethodBase.GetCurrentMethod(), $"clientId={clientId} h1={h1} h2={h2}");
 
         GetPositionSet(clientId, h1, h2);
     }
 
     [ClientRpc]
-    private void BC_MonsterSpawnClientRpc(ulong netObjId, ulong clientid)
+    private void BC_MonsterSpawnClientRpc(ulong netObjId, ulong clientId)
     {
-        // Debug.Log($"[S->C]{nameof(BC_MonsterSpawnClientRpc)}");
+        RpcLogger.LogRpc(MethodBase.GetCurrentMethod(), $"netObjId={netObjId} clientId={clientId}");
 
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(netObjId, out NetworkObject monsterNetObj)) 
         {
-            var moveList = clientid == NetworkManager.Singleton.LocalClientId ? myMonsterMoveList : otherMonsterMoveList;
+            var moveList = clientId == NetworkManager.Singleton.LocalClientId ? myMonsterMoveList : otherMonsterMoveList;
             monsterNetObj.transform.position = moveList[0];
             monsterNetObj.GetComponent<Monster>().Init(moveList);
         }
@@ -188,7 +189,7 @@ public partial class Spawner : NetworkBehaviour
     [ClientRpc]
     private void BC_SpawnHeroHolder_ClientRpc(ulong netObjId, ulong clientId)
     {
-        Debug.Log($"[S->C]{nameof(BC_SpawnHeroHolder_ClientRpc)}");
+        RpcLogger.LogRpc(MethodBase.GetCurrentMethod(), $"netObjId={netObjId} clientId={clientId}");
 
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(netObjId, out NetworkObject netObjHeroHolder))
         {

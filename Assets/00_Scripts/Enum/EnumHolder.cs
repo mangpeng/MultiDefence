@@ -20,3 +20,11 @@ public enum Rarity
     Hero,
     Lengendary
 }
+
+public class LocalStringKey
+{
+    // Table: Hero
+    public const string GUN_DESC_KEY = "GUN_DESC";
+    public const string HAMMER_DESC_KEY = "HAMMER_DESC";
+}
+

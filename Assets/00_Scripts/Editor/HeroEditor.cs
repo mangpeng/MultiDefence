@@ -102,6 +102,8 @@ public class HeroEditor : Editor
         // base.OnInspectorGUI();
 
         EditorGUILayout.PropertyField(serializedObject.FindProperty("Name"));
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("IconName"));
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("Description"));
         EditorGUILayout.PropertyField(serializedObject.FindProperty("ATK"));
         EditorGUILayout.PropertyField(serializedObject.FindProperty("ATK_Speed"));
         EditorGUILayout.PropertyField(serializedObject.FindProperty("Range"));

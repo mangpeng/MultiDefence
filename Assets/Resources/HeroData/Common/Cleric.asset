@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: Cleric
   m_EditorClassIdentifier: 
   Name: Cleric
+  IconName: Cleric
+  Description: 
   ATK: 5
   ATK_Speed: 1
   Range: 1
@@ -24,3 +26,8 @@ MonoBehaviour:
     values:
     - 0.3
     - 2
+  activeSkill:
+    type: 0
+    mCoolTime: 0
+    mSkillDamage: 0
+    mParticle: {fileID: 0}

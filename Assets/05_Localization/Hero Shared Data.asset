@@ -1,0 +1,96 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: Hero Shared Data
+  m_EditorClassIdentifier: 
+  m_TableCollectionName: Hero
+  m_TableCollectionNameGuidString: b8e67869879729d47997b4eda91e4d94
+  m_Entries:
+  - m_Id: 113615044608
+    m_Key: ARCHER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 170485612544
+    m_Key: BANDIT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 173035749376
+    m_Key: CLERIC
+    m_Metadata:
+      m_Items: []
+  - m_Id: 214303506432
+    m_Key: WARRIOR
+    m_Metadata:
+      m_Items: []
+  - m_Id: 244166950912
+    m_Key: WIZARD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 268963676160
+    m_Key: GUN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 287687049216
+    m_Key: HAMMER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 305441538048
+    m_Key: SHIELD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 327683932160
+    m_Key: SWORD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 343693590528
+    m_Key: WITCH
+    m_Metadata:
+      m_Items: []
+  - m_Id: 359430619136
+    m_Key: ARCHER(UNCOMMON)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 392410431488
+    m_Key: BANDIT(UNCOMMON)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 420730372096
+    m_Key: CLERIC(UNCOMMON)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 441601228800
+    m_Key: WARRIOR(UNCOMMON)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 468377665536
+    m_Key: WIZARD(UNCOMMON)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3992784207872
+    m_Key: HAMMER_DESC
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4023146774528
+    m_Key: GUN_DESC
+    m_Metadata:
+      m_Items: []
+  m_Metadata:
+    m_Items: []
+  m_KeyGenerator:
+    rid: 7540083111869546838
+  references:
+    version: 2
+    RefIds:
+    - rid: 7540083111869546838
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables, asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1756614373375

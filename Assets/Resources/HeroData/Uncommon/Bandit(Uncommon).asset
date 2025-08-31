@@ -13,9 +13,17 @@ MonoBehaviour:
   m_Name: Bandit(Uncommon)
   m_EditorClassIdentifier: 
   Name: Bandit(Uncommon)
+  IconName: Bandit_Uncommon
+  Description: 
   ATK: 100
   ATK_Speed: 1.5
   Range: 0.5
   animatorController: {fileID: 9100000, guid: 0200f52f14b95e843b3bdc63e9799c3d, type: 2}
   rarity: 1
   prfBullet: {fileID: 8937217233303440734, guid: 46d14921287c7834c9c7361e541f1f3d, type: 3}
+  debuffs: []
+  activeSkill:
+    type: 0
+    mCoolTime: 0
+    mSkillDamage: 0
+    mParticle: {fileID: 0}
