@@ -51,6 +51,19 @@ public partial class Spawner : NetworkBehaviour
     void Start()
     {
         StartServer();
+
+        if(IsClient)
+        {
+            StartClient();
+        }
+    }
+
+    private void StartClient()
+    {        
+        StartCoroutine(CDealy(() =>
+        {
+            GameManager.Instance.CS_SelectNickName_ServerRpc(UtilManager.LocalID); // 타이밍 이슈로 임의로 옮김. 모든 클라이언트 접속 처리 확인 되면 그 시점으로 옮겨야 함
+        }, 3.0f));
     }
 
     #region Grid

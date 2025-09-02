@@ -14,8 +14,8 @@ public partial class Spawner
         StartCoroutine(CDealy(() =>
         {
             GenerateSpawnHolder();
-            StartSpawn();
-        }, 5f));
+            StartSpawn();            
+        }, 2.0f));
     } 
 
     public void StartSpawn()

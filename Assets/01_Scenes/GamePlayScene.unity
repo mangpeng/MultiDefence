@@ -5007,8 +5007,12 @@ MonoBehaviour:
   objBossWaveCountTimer: {fileID: 1374113125}
   m_objGameOver: {fileID: 1309609580}
   m_txtGameOverWave: {fileID: 2128933649}
+  m_txtMyId: {fileID: 522705629}
+  m_txtOtherId: {fileID: 1907375454}
   m_txtMyAccDamage: {fileID: 347383077}
   m_txtOtherAccDamage: {fileID: 779402637}
+  m_txtMyProfile: {fileID: 1405099898}
+  m_txtOtherProfile: {fileID: 411797492}
 --- !u!1 &779402635
 GameObject:
   m_ObjectHideFlags: 0
@@ -8049,7 +8053,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 125.42, y: -50}
-  m_SizeDelta: {x: 0, y: 151.6753}
+  m_SizeDelta: {x: 72.84, y: 151.6753}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1242064624
 MonoBehaviour:
@@ -11305,7 +11309,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1718506099}
   m_Layer: 5
-  m_Name: Profile
+  m_Name: MyProfile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12887,7 +12891,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1922243429}
   m_Layer: 5
-  m_Name: Profile (1)
+  m_Name: OtherProfile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

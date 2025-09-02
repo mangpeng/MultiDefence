@@ -39,22 +39,22 @@ public partial class GameManager : NetworkBehaviour
     {
         if (IsServer)
         {
-            StartClient();
+            StartServer();
         }
 
         if (IsClient)
         {
-            StartServer();
+            StartClient();
         }
     }
     private void Update()
-    {        
+    {
         if (IsServer)
         {
             UpdateServer();
-        } 
-        
-        if(IsClient) 
+        }
+
+        if (IsClient)
         {
             UpdateClient();
         }
@@ -62,13 +62,12 @@ public partial class GameManager : NetworkBehaviour
 
     private void StartClient()
     {
-
+        CS_UpdateNickName_ServerRpc(UtilManager.LocalID, CloudManager.Instance.m_dataPlayer.m_id);
     }
-
 
     private void UpdateClient()
     {
-
+        
     }
 
     public void GetMoney(int value)
@@ -224,6 +223,21 @@ public partial class GameManager : NetworkBehaviour
 
             UIMain.Instance.OnWavePopup(curWave, bossName);
         }
+    }
+
+    [ClientRpc]
+    // fixme 애초에 게임 접속시 서버, 클라 모두 플레이어 정보를 알수 있도록 변경 필요.
+    private void S2C_SelectNickName_ClientRpc(ulong clientId, string id, ClientRpcParams clientRpcParams = default)
+    {
+        // host는 이미 서버 로직에서 캐싱 되어 있으므로
+        if(!IsHost)
+        {
+            Debug.Log($"{clientId}, {id}");
+            dicPlayers.Add(clientId, id);
+        }
+
+        bool isMe = clientId == UtilManager.LocalID;
+        UIMain.Instance.UpdateProfile(isMe, id);
     }
     #endregion
 }

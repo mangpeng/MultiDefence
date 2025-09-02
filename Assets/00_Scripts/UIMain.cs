@@ -48,8 +48,14 @@ public class UIMain : Singleton<UIMain>
     [Header("##GameOver")]
     [SerializeField] private GameObject m_objGameOver;
     [SerializeField] private TextMeshProUGUI m_txtGameOverWave;
+    [SerializeField] private TextMeshProUGUI m_txtMyId;
+    [SerializeField] private TextMeshProUGUI m_txtOtherId;
     [SerializeField] private TextMeshProUGUI m_txtMyAccDamage;
     [SerializeField] private TextMeshProUGUI m_txtOtherAccDamage;
+
+    [Header("##Profile")]
+    [SerializeField] private TextMeshProUGUI m_txtMyProfile;
+    [SerializeField] private TextMeshProUGUI m_txtOtherProfile;
 
     private List<TextMeshProUGUI> listNaviTxt = new();
 
@@ -65,6 +71,8 @@ public class UIMain : Singleton<UIMain>
         GameManager.Instance.OnUpdateUITime += UpdateUITime;
 
         btnSummon.onClick.AddListener(BtnSummon);
+        
+        
     }
 
     private void Update()
@@ -87,6 +95,18 @@ public class UIMain : Singleton<UIMain>
 
     #region UI
 
+    public void UpdateProfile(bool isMe, string id)
+    {
+        if (isMe)
+        {
+            m_txtMyProfile.text = id;
+        }
+        else
+        {
+            m_txtOtherProfile.text = id;
+        }
+    }
+
     public void OnGameOver(int curWave, Dictionary<ulong, int> dicAccDamage)
     {
         Time.timeScale = 0;
@@ -103,6 +123,19 @@ public class UIMain : Singleton<UIMain>
                 m_txtOtherAccDamage.text = damage.ToString();
             }
         }
+
+        foreach (var (id, nickName) in GameManager.Instance.dicPlayers)
+        {
+            if (id == UtilManager.LocalID)
+            {
+                m_txtMyId.text = nickName;
+            }
+            else
+            {
+                m_txtOtherId.text = nickName;
+            }
+        }
+
         m_objGameOver.SetActive(true);
 
         StartCoroutine(CoDealy(3.0f));

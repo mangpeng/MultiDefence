@@ -15,6 +15,7 @@ public partial class GameManager
     public bool inBoss = false;
     public Coroutine coCountDown;
     public Dictionary<ulong/*client id*/, int/*accumulated damage*/> dicAccDamage = new();
+    public Dictionary<ulong/*client id*/, string/*id*/> dicPlayers = new();
 
     private bool m_isChangingScene = false;
 
@@ -24,7 +25,7 @@ public partial class GameManager
         dicAccDamage.Add(0, 0);
         dicAccDamage.Add(1, 0);
 
-        coCountDown = StartCoroutine(CoCountdown());
+        coCountDown = StartCoroutine(CoCountdown());        
     }
 
     private void UpdateServer()
@@ -81,6 +82,32 @@ public partial class GameManager
         m_isChangingScene = true;
         NetworkManager.Singleton.SceneManager.LoadScene("MainScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
     }
-  
+
+    [ServerRpc(RequireOwnership = false)]
+    public void CS_UpdateNickName_ServerRpc(ulong clientId, string id)
+    {
+        Debug.Log(2);
+        if (dicPlayers.TryAdd(clientId, id))
+        {
+            Debug.Log($"{clientId}, {id}");
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void CS_SelectNickName_ServerRpc(ulong sender)
+    {
+        Debug.Log($"sender: {sender}");
+        foreach (var (clientId, id) in dicPlayers)
+        {
+            var rpcParamsToSender = new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new[] { sender }
+                }
+            };
+            S2C_SelectNickName_ClientRpc(clientId, id, rpcParamsToSender);
+        }
+    }
     #endregion
 }
