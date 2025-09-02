@@ -18,4 +18,4 @@ public partial class NetManager: MonoBehaviour
             NetworkManager.Singleton.SceneManager.LoadScene(gamePlaySceneName, UnityEngine.SceneManagement.LoadSceneMode.Single);
         }
     }
-}
+} 

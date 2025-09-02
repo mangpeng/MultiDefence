@@ -6,17 +6,33 @@ public partial class Spawner
 {
     public BossStat dataBoss;
 
+    private Coroutine m_coSpawnMonster;
+
     private void StartServer()
     {
         SetGrid();
         StartCoroutine(CDealy(() =>
         {
             GenerateSpawnHolder();
-            StartCoroutine(CSpawnMonster());
+            StartSpawn();
         }, 5f));
     } 
 
-    public IEnumerator CSpawnMonster()
+    public void StartSpawn()
+    {
+        StopSpawn();
+        m_coSpawnMonster = StartCoroutine(CoSpawnMonster());
+    }
+
+    public void StopSpawn()
+    {
+        if(m_coSpawnMonster != null)
+        {
+            StopCoroutine(m_coSpawnMonster);
+        }
+    }
+
+    public IEnumerator CoSpawnMonster()
     {
         if (!IsServer) yield break;
         

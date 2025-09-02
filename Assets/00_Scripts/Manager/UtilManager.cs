@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -45,5 +46,11 @@ public class UtilManager
             case Rarity.Lengendary: return Color.black;
             default: return Color.black;
         }
+    }
+
+    public static IEnumerator CoCallDelay(float dealy, Action action)
+    {
+        yield return new WaitForSeconds(dealy);
+        action?.Invoke();
     }
 }

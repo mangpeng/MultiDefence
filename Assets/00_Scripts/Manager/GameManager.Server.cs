@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,9 +14,16 @@ public partial class GameManager
 
     public bool inBoss = false;
     public Coroutine coCountDown;
+    public Dictionary<ulong/*client id*/, int/*accumulated damage*/> dicAccDamage = new();
+
+    private bool m_isChangingScene = false;
 
     private void StartServer()
     {
+        //fixme 클라 접속 완료시 처리시 아래 작업 되도록 수정 필요
+        dicAccDamage.Add(0, 0);
+        dicAccDamage.Add(1, 0);
+
         coCountDown = StartCoroutine(CoCountdown());
     }
 
@@ -51,8 +59,28 @@ public partial class GameManager
         coCountDown = StartCoroutine(CoCountdown());
     }
 
-    #region RPC
+    public static void DespawnAllNetworkObjects()
+    {
+        foreach (var netObj in NetworkManager.Singleton.SpawnManager.SpawnedObjectsList)
+        {
+            if (netObj != null && netObj.IsSpawned)
+            {
+                netObj.Despawn(true); // true → 씬에서 Destroy도 같이
+            }
+        }
+    }
 
+    #region RPC
+    [ServerRpc(RequireOwnership = false)] 
+    public void CS_ChangeScene_ServerRpc()
+    {
+        if (m_isChangingScene)
+            return;
+
+        // GameManager.DespawnAllNetworkObjects();
+        m_isChangingScene = true;
+        NetworkManager.Singleton.SceneManager.LoadScene("MainScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
+    }
   
     #endregion
 }

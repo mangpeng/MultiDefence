@@ -77,7 +77,6 @@ public partial class Spawner : NetworkBehaviour
 
     private void GridStart(Transform tr, bool isPlayer)
     {
-        Debug.Log($"GridStart {UtilManager.LocalID}");
         var parentSprite = tr.GetComponent<SpriteRenderer>();
         float parentSpriteWidth = parentSprite.bounds.size.x;
         float parentSpriteHeight = parentSprite.bounds.size.y;

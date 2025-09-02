@@ -531,7 +531,7 @@ MonoBehaviour:
   imgHp: {fileID: 9071871896876719819}
   imgHp2: {fileID: 5601629563621863280}
   HP: 0
-  MaxHP: 100
+  MaxHP: 1000
   prfStun: {fileID: 2877087975102927255}
 --- !u!58 &6866084378737591108
 CircleCollider2D:

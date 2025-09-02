@@ -11,12 +11,24 @@ public partial class Monster
 {
     private Coroutine[] mCoDebuff = new Coroutine[Enum.GetValues(typeof(Debuff)).Length];
 
-    public void GetDamage(int dmg)
+    public void GetDamage(ulong attacker, int dmg)
     {
         if (!IsServer) return;
         if (isDead) return;
 
+        var preHp = HP;
+
         HP -= dmg;
+        HP = (int)MathF.Max(HP, 0);
+
+        var finalDamage = preHp - HP;
+        if(GameManager.Instance.dicAccDamage.ContainsKey(attacker))
+        {
+            GameManager.Instance.dicAccDamage[attacker] += finalDamage;
+        } else
+        {
+            GameManager.Instance.dicAccDamage.Add(attacker, finalDamage);
+        }
 
         isDead = HP <= 0;
 

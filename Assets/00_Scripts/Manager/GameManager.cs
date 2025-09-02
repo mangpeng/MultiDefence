@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Unity.Netcode;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
+using UnityEditor.Localization.Plugins.XLIFF.V20;
 using UnityEditor.PackageManager;
 using UnityEngine;
 
@@ -22,6 +24,7 @@ public partial class GameManager : NetworkBehaviour
     public int SummonNeedMoney = 20;
     public int HeroCount = 0;
     public const int MAX_HERO_COUNT = 25;
+    public const int MAX_MONSTER_COUNT = 100;
 
     public List<Monster> Monsters = new();
     public int MonsterCount;
@@ -86,7 +89,16 @@ public partial class GameManager : NetworkBehaviour
         }
             
         MonsterCount++;
+        
         BC_ClientMonsterCount_ClientRpc(MonsterCount, false); //TODO 서버에게 요청 하고 처리 하도록 변경 필요
+
+        if (MonsterCount >= MAX_MONSTER_COUNT)
+        {
+            Spawner.instance.StopSpawn();
+
+            var payload = UniversalDictPayload.From(dicAccDamage);
+            BC_GameOver_ClientRpc(curWave, payload);
+        }
     }
 
     public void RemoveMonster(Monster m, bool isBoss)
@@ -110,7 +122,7 @@ public partial class GameManager : NetworkBehaviour
                 ++curWave;
                 coCountDown = StartCoroutine(CoCountdown());
 
-                StartCoroutine(Spawner.instance.CSpawnMonster());
+                StartCoroutine(Spawner.instance.CoSpawnMonster());
                 //
 
 
@@ -166,6 +178,15 @@ public partial class GameManager : NetworkBehaviour
     }
 
     #region RPC
+    [ClientRpc]
+    private void BC_GameOver_ClientRpc(int curWave, UniversalDictPayload payload)
+    {
+        var dic = payload.ToDictionary<ulong, int>();
+        if (dic == null || dic.Count != 2) return;
+
+        UIMain.Instance.OnGameOver(curWave, dic);
+    }
+
     [ClientRpc]
     private void BC_ClientMonsterCount_ClientRpc(int count, bool isDeadBoss)
     {

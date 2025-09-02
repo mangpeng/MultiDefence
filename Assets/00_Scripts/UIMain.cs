@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.Netcode;
 using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.UI;
@@ -44,6 +45,12 @@ public class UIMain : Singleton<UIMain>
     [SerializeField] public GameObject objBossWaveCount;
     [SerializeField] private TextMeshProUGUI objBossWaveCountTimer;
 
+    [Header("##GameOver")]
+    [SerializeField] private GameObject m_objGameOver;
+    [SerializeField] private TextMeshProUGUI m_txtGameOverWave;
+    [SerializeField] private TextMeshProUGUI m_txtMyAccDamage;
+    [SerializeField] private TextMeshProUGUI m_txtOtherAccDamage;
+
     private List<TextMeshProUGUI> listNaviTxt = new();
 
     protected override void Awake()
@@ -77,8 +84,36 @@ public class UIMain : Singleton<UIMain>
             mTxtUgradeAsset[i].text = $"{30 + GameManager.Instance.mUpgrade[i]}";
         }
     }
-    
+
     #region UI
+
+    public void OnGameOver(int curWave, Dictionary<ulong, int> dicAccDamage)
+    {
+        Time.timeScale = 0;
+
+        m_txtGameOverWave.text = $"WAVE {curWave}";
+
+        foreach (var (id, damage) in dicAccDamage)
+        {
+            if(id == UtilManager.LocalID)
+            {
+                m_txtMyAccDamage.text = damage.ToString();
+            } else
+            {
+                m_txtOtherAccDamage.text = damage.ToString();
+            }
+        }
+        m_objGameOver.SetActive(true);
+
+        StartCoroutine(CoDealy(3.0f));
+    }
+
+    IEnumerator CoDealy(float dealy)
+    {
+        yield return new WaitForSecondsRealtime(dealy);
+        Time.timeScale = 1.0f;
+        GameManager.Instance.CS_ChangeScene_ServerRpc();
+    }
 
     public void OnWavePopup(int wave, string bossName)
     {

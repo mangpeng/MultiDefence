@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Diagnostics;
 using UnityEngine.UI;
 
 public class Skill : MonoBehaviour
@@ -94,7 +95,7 @@ public class Skill : MonoBehaviour
         foreach (var monster in overlappedMonsters)
         {
             monster.C2S_Debuff_ServerRpc(Debuff.Stun, new float[]{ 1.0f });
-            monster.GetDamage(Damage);
+            monster.GetDamage(mHero.GetClientId(), Damage);
         }
     }
 

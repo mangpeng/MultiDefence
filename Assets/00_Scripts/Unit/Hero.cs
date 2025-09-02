@@ -197,7 +197,7 @@ public class Hero : Character
             return;
         }
 
-        CS_AttackMonsterServerRpc(attackTarget.GetComponent<NetworkObject>().NetworkObjectId);
+        CS_AttackMonsterServerRpc(parentHolder.clientId, attackTarget.GetComponent<NetworkObject>().NetworkObjectId);
     }
 
     public void ChangeAttackSpeed(float duration, float afterValue)
@@ -216,9 +216,14 @@ public class Hero : Character
         m_anim.speed = aftervalue;
     }
 
+    public ulong GetClientId()
+    {
+        return parentHolder.clientId;
+    }
+
     #region Network
     [ServerRpc(RequireOwnership = false)]
-    public void CS_AttackMonsterServerRpc(ulong targetId)
+    public void CS_AttackMonsterServerRpc(ulong clientId, ulong targetId)
     {
         RpcLogger.LogRpc(MethodBase.GetCurrentMethod(), $"target={targetId}");
 
@@ -228,7 +233,7 @@ public class Hero : Character
             if (monster == null)
                 return;
 
-            monster.GetDamage(ATK);
+            monster.GetDamage(GetClientId(), ATK);
             foreach (var debuff in m_Data.debuffs ?? Enumerable.Empty<SkillDebuff>())
             {
                 var chance = debuff.values[0];

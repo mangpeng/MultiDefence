@@ -21,6 +21,9 @@ public class RpcMonitorWindow : EditorWindow
     private bool _paused = false;
     private bool _autoScroll = true;
 
+    // Max entries (auto trim)
+    private int _maxEntries = 5000;
+
     // Time filter: last N minutes (0 = all)
     private readonly int[] _minuteChoices = { 0, 1, 5, 15, 60, 180, 720, 1440 };
     private int _minuteChoiceIndex = 0;
@@ -48,9 +51,11 @@ public class RpcMonitorWindow : EditorWindow
 
     private void OnGUI()
     {
-        // Queue → buffer 동기화 (일시정지 시에는 갱신 보류)
         if (!_paused)
-            RpcLogger.Flush();
+        {
+            RpcLogger.Flush();             // 새 로그 버퍼로 이동 (여기서 중복 압축됨)
+            RpcLogger.TrimTo(_maxEntries); // 자동 트림
+        }
 
         DrawToolbar();
         EditorGUILayout.Space(4);
@@ -66,7 +71,6 @@ public class RpcMonitorWindow : EditorWindow
             // 검색창
             var searchStyle = EditorStyles.toolbarSearchField ?? EditorStyles.textField;
             _search = GUILayout.TextField(_search ?? string.Empty, searchStyle, GUILayout.MinWidth(200));
-
             if (GUILayout.Button("x", EditorStyles.toolbarButton, GUILayout.Width(20)))
                 _search = string.Empty;
 
@@ -74,9 +78,11 @@ public class RpcMonitorWindow : EditorWindow
 
             // 시간 필터
             GUILayout.Label("Last (min):", EditorStyles.miniLabel, GUILayout.Width(65));
-            _minuteChoiceIndex = EditorGUILayout.Popup(_minuteChoiceIndex,
+            _minuteChoiceIndex = EditorGUILayout.Popup(
+                _minuteChoiceIndex,
                 _minuteChoices.Select(m => m == 0 ? "All" : m.ToString()).ToArray(),
-                GUILayout.Width(70));
+                GUILayout.Width(70)
+            );
 
             GUILayout.FlexibleSpace();
 
@@ -89,7 +95,13 @@ public class RpcMonitorWindow : EditorWindow
             _paused = GUILayout.Toggle(_paused, _paused ? "Paused" : "Live", EditorStyles.toolbarButton);
             _autoScroll = GUILayout.Toggle(_autoScroll, "AutoScroll", EditorStyles.toolbarButton);
 
-            // 필터 초기화
+            // Max Entries
+            GUILayout.Space(8);
+            GUILayout.Label("Max Entries:", EditorStyles.miniLabel, GUILayout.Width(80));
+            _maxEntries = EditorGUILayout.IntField(_maxEntries, GUILayout.Width(80));
+            if (_maxEntries < 100) _maxEntries = 100;
+
+            // Clear Filters
             if (GUILayout.Button("Clear Filters", EditorStyles.toolbarButton, GUILayout.Width(110)))
             {
                 _methodFilter.Clear();
@@ -98,7 +110,14 @@ public class RpcMonitorWindow : EditorWindow
                 _selectedIndex = -1;
             }
 
-            // CSV 내보내기
+            // Clear Logs
+            if (GUILayout.Button("Clear Logs", EditorStyles.toolbarButton, GUILayout.Width(90)))
+            {
+                RpcLogger.Clear();
+                _selectedIndex = -1;
+            }
+
+            // CSV
             if (GUILayout.Button("Export CSV", EditorStyles.toolbarButton, GUILayout.Width(100)))
             {
                 ExportCsv();
@@ -155,7 +174,6 @@ public class RpcMonitorWindow : EditorWindow
         var entries = RpcLogger.Entries ?? (IReadOnlyList<RpcLogEntry>)Array.Empty<RpcLogEntry>();
         var filtered = entries.Where(FilterByAll).OrderByDescending(e => e.Timestamp).ToList();
 
-        // 리스트
         _scroll = EditorGUILayout.BeginScrollView(_scroll, GUILayout.Height(position.height * 0.6f));
         for (int i = 0; i < filtered.Count; i++)
         {
@@ -166,7 +184,10 @@ public class RpcMonitorWindow : EditorWindow
             {
                 var prev = GUI.color;
                 GUI.color = color;
-                var title = $"{e.Timestamp:HH:mm:ss.fff}  [{e.Kind}]  {e.Direction}  {e.Method}";
+
+                // 타이틀에 xN 표기
+                var repeat = e.RepeatCount > 1 ? $"  x{e.RepeatCount}" : string.Empty;
+                var title = $"{e.Timestamp:HH:mm:ss.fff}~{(e.RepeatCount > 1 ? e.LastTimestamp.ToString("HH:mm:ss.fff") : e.Timestamp.ToString("HH:mm:ss.fff"))}  [{e.Kind}]  {e.Direction}  {e.Method}{repeat}";
                 if (GUILayout.Button(title, EditorStyles.boldLabel))
                 {
                     _selectedIndex = i;
@@ -177,7 +198,6 @@ public class RpcMonitorWindow : EditorWindow
 
                 if (!string.IsNullOrEmpty(e.PayloadSummary))
                 {
-                    // 한 줄 요약만 먼저 표시
                     GUILayout.Label($"Payload: {TrimForOneLine(e.PayloadSummary)}");
                 }
 
@@ -194,18 +214,16 @@ public class RpcMonitorWindow : EditorWindow
                     if (GUILayout.Button("Copy Row", GUILayout.Width(100)))
                     {
                         EditorGUIUtility.systemCopyBuffer =
-                            $"{e.Timestamp:o},{e.Kind},{e.Direction},{e.Method},{e.SenderClientId},{e.Targets},{e.PayloadSummary}";
+                            $"{e.Timestamp:o},{e.LastTimestamp:o},{e.RepeatCount},{e.Kind},{e.Direction},{e.Method},{e.SenderClientId},{e.Targets},{e.PayloadSummary}";
                     }
                 }
             }
         }
         EditorGUILayout.EndScrollView();
 
-        // 자동 스크롤
         if (_autoScroll && Event.current.type == EventType.Repaint && !_paused)
             _scroll.y = float.MaxValue;
 
-        // 상세 패널 (선택된 로그)
         DrawDetailsPanel(filtered);
     }
 
@@ -221,7 +239,9 @@ public class RpcMonitorWindow : EditorWindow
             }
 
             var e = filtered[_selectedIndex];
-            EditorGUILayout.LabelField("Time", e.Timestamp.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+            EditorGUILayout.LabelField("First Time", e.Timestamp.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+            EditorGUILayout.LabelField("Last Time", e.LastTimestamp.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+            EditorGUILayout.LabelField("Repeat", e.RepeatCount.ToString());
             EditorGUILayout.LabelField("Kind", e.Kind.ToString());
             EditorGUILayout.LabelField("Direction", e.Direction.ToString());
             EditorGUILayout.LabelField("Method", e.Method);
@@ -234,7 +254,6 @@ public class RpcMonitorWindow : EditorWindow
             var looksLikeJson = !string.IsNullOrEmpty(e.PayloadSummary) &&
                                 (e.PayloadSummary.TrimStart().StartsWith("{") || e.PayloadSummary.TrimStart().StartsWith("["));
 
-            // 탭 비슷한 스위치
             using (new EditorGUILayout.HorizontalScope())
             {
                 GUILayout.Label(looksLikeJson ? "JSON view available" : "Plain text", EditorStyles.miniLabel);
@@ -243,31 +262,18 @@ public class RpcMonitorWindow : EditorWindow
                     EditorGUIUtility.systemCopyBuffer = e.PayloadSummary ?? string.Empty;
             }
 
-            // JSON이면 Pretty Print 버튼
             if (looksLikeJson)
             {
                 if (GUILayout.Button("Pretty Print JSON"))
                 {
-                    try
-                    {
-                        _prettyCache = PrettyJson(e.PayloadSummary);
-                        _prettyOk = true;
-                    }
-                    catch
-                    {
-                        _prettyOk = false;
-                        _prettyCache = "Failed to pretty-print JSON.";
-                    }
+                    try { _prettyCache = PrettyJson(e.PayloadSummary); _prettyOk = true; }
+                    catch { _prettyOk = false; _prettyCache = "Failed to pretty-print JSON."; }
                 }
 
                 if (_prettyOk && !string.IsNullOrEmpty(_prettyCache))
-                {
                     EditorGUILayout.TextArea(_prettyCache, GUILayout.MinHeight(100));
-                }
                 else
-                {
                     EditorGUILayout.TextArea(e.PayloadSummary ?? string.Empty, GUILayout.MinHeight(100));
-                }
             }
             else
             {
@@ -296,7 +302,7 @@ public class RpcMonitorWindow : EditorWindow
         if (minutes > 0)
         {
             DateTime threshold = DateTime.Now.AddMinutes(-minutes);
-            if (e.Timestamp < threshold) return false;
+            if (e.LastTimestamp < threshold) return false; // 압축된 경우 '마지막 시간' 기준으로 필터
         }
 
         // 검색어
@@ -319,7 +325,6 @@ public class RpcMonitorWindow : EditorWindow
         return text.Length <= max ? text : text.Substring(0, max) + " …";
     }
 
-    /// <summary>아주 가벼운 JSON pretty printer (의존성 없이 동작)</summary>
     private static string PrettyJson(string json)
     {
         if (string.IsNullOrEmpty(json)) return string.Empty;
@@ -334,7 +339,6 @@ public class RpcMonitorWindow : EditorWindow
             {
                 case '"':
                     sb.Append(c);
-                    // 이스케이프된 쿼트인지 확인
                     bool escaped = false;
                     int j = i;
                     while (j > 0 && json[--j] == '\\') escaped = !escaped;
@@ -401,21 +405,22 @@ public class RpcMonitorWindow : EditorWindow
         try
         {
             using var sw = new StreamWriter(path, false, new UTF8Encoding(true));
-            sw.WriteLine("Timestamp,Kind,Direction,Method,SenderClientId,Targets,Payload");
+            sw.WriteLine("FirstTimestamp,LastTimestamp,RepeatCount,Kind,Direction,Method,SenderClientId,Targets,Payload");
+
+            string Esc(string s)
+            {
+                if (s == null) return "";
+                bool needQuote = s.Contains(',') || s.Contains('"') || s.Contains('\n') || s.Contains('\r');
+                s = s.Replace("\"", "\"\"");
+                return needQuote ? $"\"{s}\"" : s;
+            }
 
             foreach (var e in rows)
             {
-                // CSV escaping
-                string Esc(string s)
-                {
-                    if (s == null) return "";
-                    bool needQuote = s.Contains(',') || s.Contains('"') || s.Contains('\n') || s.Contains('\r');
-                    s = s.Replace("\"", "\"\"");
-                    return needQuote ? $"\"{s}\"" : s;
-                }
-
                 sw.WriteLine(
                     $"{e.Timestamp:O}," +
+                    $"{e.LastTimestamp:O}," +
+                    $"{e.RepeatCount}," +
                     $"{e.Kind}," +
                     $"{e.Direction}," +
                     $"{Esc(e.Method)}," +
