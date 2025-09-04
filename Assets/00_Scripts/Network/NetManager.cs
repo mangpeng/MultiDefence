@@ -36,16 +36,24 @@ public partial class NetManager : MonoBehaviour
         m_btnNickNameConfirm.onClick.AddListener(OnBtnNicknameConfirm);
 
         await UnityServices.InitializeAsync();
-        if(!AuthenticationService.Instance.IsSignedIn)
+        if (!AuthenticationService.Instance.IsSignedIn)
         {
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
-            //await CloudManager.Instance.DeletePlayerData();
+            //await CloudManager.Instance.DelgamtePlayerData();
             // await CloudManager.Instance.SavePlayerData(new DataPlayer("kim", 12));
             var data = await CloudManager.Instance.LoadPlayerData();
             if (data.m_id.IsNullOrEmpty())
             {
                 m_objNickNameUI.SetActive(true);
             }
+
+            //todo 게임에서 다시 메인으로 돌아가는 경우 메인 씬 초기화 필요.
+
+
+        }
+        else
+        {
+            //todo 게임에서 다시 메인으로 돌아가는 경우 메인 씬 초기화 필요.
         }
     }   
 

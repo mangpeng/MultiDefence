@@ -56,6 +56,11 @@ public partial class GameManager
         }
                     
         ++curWave;
+        if(curWave > CloudManager.Instance.m_dataPlayer.m_wave)
+        {
+            CloudManager.Instance.m_dataPlayer.m_wave = curWave;
+            _ = CloudManager.Instance.SaveAsync();
+        }
 
         coCountDown = StartCoroutine(CoCountdown());
     }

@@ -11,12 +11,14 @@ public class DataPlayer
 {
     public string m_id;
     public int m_level;
+    public int m_wave;
 
 
-    public DataPlayer(string id, int level)
+    public DataPlayer(string id, int level, int wave)
     {
         m_id = id;
         m_level = level;
+        m_wave = wave;
     }
 } 
 
@@ -93,7 +95,7 @@ public class CloudManager : Singleton<CloudManager>
             Debug.LogError(e.Message);
         }
 
-        DataPlayer defaultData = new DataPlayer(null, 1);
+        DataPlayer defaultData = new DataPlayer(null, 1, 1);
         m_dataPlayer = defaultData;
         return defaultData;
     }
