@@ -1,9 +1,5 @@
-using UnityEditor.Localization.Editor;
-using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
-using UnityEngine.Localization.Tables;
-using UnityEngine.U2D;
 
 public class LocalizationManager
 {

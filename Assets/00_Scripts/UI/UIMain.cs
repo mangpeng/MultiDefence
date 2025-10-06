@@ -1,10 +1,7 @@
-using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
-using Unity.Netcode;
-using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.UI;
 using WebSocketSharp;
@@ -205,7 +202,7 @@ public class UIMain : Singleton<UIMain>
 
     IEnumerator CoSummonTrail()
     {
-        var data = Spawner.instance.GetRandomHeroCommonData();
+        var data = ResourceManager.GetRandomHeroDataByRarityOrNull(Rarity.Common);
         var emptyHolder = Spawner.instance.FindEmptyHereHolderOrNull(UtilManager.LocalID, data.Name);
         
         if(emptyHolder == null)

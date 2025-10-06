@@ -4,10 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using Unity.Netcode;
-using Unity.VisualScripting;
-using UnityEditor.PackageManager;
 using UnityEngine;
 using WebSocketSharp;
 
@@ -242,12 +239,6 @@ public partial class Spawner : NetworkBehaviour
     public HeroHolder FindEmptyHereHolderOrNull(ulong clientid, string hereName)
     {
         return dicHolder[clientid].FindAll((holder) => (holder.HolderName == hereName && holder.Heros.Count < 3) || (holder.HolderName.IsNullOrEmpty())).FirstOrDefault();
-    }
-
-    public HeroStat GetRandomHeroCommonData()
-    {
-        HeroStat[] datas = Resources.LoadAll<HeroStat>("HeroData/Common");
-        return datas[UnityEngine.Random.Range(0, datas.Length)];
     }
 
     #endregion

@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Setting
   m_EditorClassIdentifier: 
   m_rarity_percent:
-  - 0
-  - 0
-  - 0
-  - 0
+  - 60
+  - 27
+  - 8
+  - 5
   - 0

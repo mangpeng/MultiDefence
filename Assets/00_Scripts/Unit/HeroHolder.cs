@@ -1,14 +1,7 @@
 using IGN.Common.Actions;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.Android.Gradle.Manifest;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.UIElements;
-using WebSocketSharp;
-using static UnityEditor.ShaderData;
-using static UnityEngine.GraphicsBuffer;
 
 public partial class HeroHolder : NetworkBehaviour
 {

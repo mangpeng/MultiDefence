@@ -1,7 +1,8 @@
-using System;
 using System.Collections;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
+using Action = System.Action;
 
 public class UtilManager
 {
@@ -52,5 +53,11 @@ public class UtilManager
     {
         yield return new WaitForSeconds(dealy);
         action?.Invoke();
+    }
+
+    public static HeroStat GetHeroStatDataByNameOrNull(string name)
+    {
+        var datas = Resources.LoadAll<HeroStat>($"HeroData").ToList();
+        return datas.Find((d) => d.Name == name);
     }
 }

@@ -3,8 +3,24 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Services.CloudSave;
-using Unity.Services.CloudSave.Models;
 using UnityEngine;
+
+[System.Serializable]
+public class DataHero
+{
+    public string m_name;
+    public Rarity m_rarity;
+    public int m_count;
+    public int m_level;
+
+    public DataHero(string name, Rarity rarity, int count, int level)
+    {
+        m_name = name;
+        m_rarity = rarity;
+        m_count = count;
+        m_level = level;
+    }
+}
 
 [System.Serializable]
 public class DataPlayer
@@ -12,18 +28,40 @@ public class DataPlayer
     public string m_id;
     public int m_level;
     public int m_wave;
+    public int m_dia;
+    public Dictionary<string, DataHero> m_dicHero;
 
-
-    public DataPlayer(string id, int level, int wave)
+    public DataPlayer(string id, int level, int wave, int dia)
     {
         m_id = id;
         m_level = level;
         m_wave = wave;
+        m_dia = dia;
+
+        m_dicHero = new();
+
+        for(int i = 0; i < 2; i++)
+        {
+            var rarity = (Rarity)i;
+            var datas = ResourceManager.GetHeroDataByRarityOrNull(rarity);
+            if(datas != null && datas.Count != 0)
+            {
+                foreach (var data in datas)
+                {
+                    m_dicHero.Add(data.Name, new DataHero(data.Name, data.rarity, 0, 0));
+                }
+            }
+        }
     }
-} 
+}
+
+public delegate void OnDiaEvent();
 
 public class CloudManager : Singleton<CloudManager>
 {
+    public event OnDiaEvent onAddDiaEvent;
+    public event OnDiaEvent onRemoveDiaEvent;
+
     public const string KEY_PLAYER_DATA = "PlayerData";
 
     public DataPlayer m_dataPlayer;
@@ -95,7 +133,7 @@ public class CloudManager : Singleton<CloudManager>
             Debug.LogError(e.Message);
         }
 
-        DataPlayer defaultData = new DataPlayer(null, 1, 1);
+        DataPlayer defaultData = new DataPlayer(id: null, level: 1, wave: 0, dia: 0);
         m_dataPlayer = defaultData;
         return defaultData;
     }
@@ -110,6 +148,37 @@ public class CloudManager : Singleton<CloudManager>
         {
             Debug.LogError(e.Message);
         }
+    }
+
+    //
+    public bool AddDia(int addValue)
+    {
+        long tmp = m_dataPlayer.m_dia + addValue;
+        if (tmp > Int32.MaxValue)
+        {
+            Debug.LogWarning("Exceed int32 max value");
+            return false;
+        }
+
+        if(tmp < 0)
+        {
+            Debug.LogWarning("Can't be below zero");
+            return false;
+        }
+
+        m_dataPlayer.m_dia += addValue;
+
+        if (addValue > 0)
+        {
+            onAddDiaEvent?.Invoke();
+        }
+
+        if (addValue < 0)
+        {
+            onRemoveDiaEvent?.Invoke();
+        }
+
+        return true;
     }
 }
 

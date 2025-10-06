@@ -15,6 +15,13 @@ public class UISceneMain : MonoBehaviour
     [SerializeField] private TextMeshProUGUI m_txtLevel;
     [SerializeField] private TextMeshProUGUI m_txtWave;
 
+    [SerializeField] private GameObject m_loading;
+
+    private void Start()
+    {
+        m_loading.SetActive(true);
+    }
+
     public void SetLevel(int level)
     {
         m_txtLevel.text = $"Lv.{level}";
